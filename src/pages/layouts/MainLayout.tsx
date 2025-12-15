@@ -8,7 +8,7 @@ export default function MainLayout() {
       <main className="flex-1">
         <Outlet />
       </main>
-      <footer className="py-8 text-center  border-t border-gray-300">
+      <footer className="py-8 text-center bg-teal-50">
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center gap-2 mb-2">
             <span className="text-lg font-semibold  text-teal-600">

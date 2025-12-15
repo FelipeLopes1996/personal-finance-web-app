@@ -19,15 +19,15 @@ export function TextField({ labelText = "", ...props }: InputTextFieldProps) {
         {...props}
         className={clsx(
           "p-4",
-          "rounded-[20px]",
-          "bg-[#1A1F36]",
-          "text-[#C9C9C9]",
+          "rounded-[10px]",
+          "bg-white",
+          "text-[#000000]",
           "placeholder-gray-400",
-          "border border-[#737677]",
+          "border border-teal-400",
           "focus:outline-none",
           "focus:border-transparent",
           "focus:ring-2",
-          "focus:ring-blue-600",
+          "focus:ring-teal-400",
           props.className
         )}
         id={id}
