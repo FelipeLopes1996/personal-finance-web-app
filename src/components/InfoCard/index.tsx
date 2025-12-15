@@ -14,7 +14,7 @@ const InfoCard = ({
   isInComing,
 }: InfoCardProps) => {
   return (
-    <div className=" p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 h-full">
+    <div className=" p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 h-full ">
       <div className="flex items-center justify-center text-teal-600 bg-teal-200 rounded-full h-16 w-16 mx-auto mb-4">
         {Icon || "..."}
       </div>
