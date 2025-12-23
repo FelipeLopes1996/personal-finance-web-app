@@ -5,12 +5,21 @@ import { Button } from "../Button";
 import clsx from "clsx";
 import { useState } from "react";
 import { RegisterSchema } from "../../schemas/RegisterSchema";
+import { apiRequest } from "../../utils/api-request";
+import { useNavigate } from "react-router-dom";
+import CustomToast from "../CustomToast";
+import { formatCurrency } from "../../utils/formatCurrency";
+import { parseCurrencyToNumber } from "../../utils/parseCurrencyToNumber";
 
-// interface UserForm {
-//   username: string;
-//   email: string;
-// }
+interface IRegisterUser {
+  name: string;
+  email: string;
+  salary: string;
+  password: string;
+}
+
 export default function RegisterForm() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -23,98 +32,100 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async ({
+    name,
     email,
+    salary,
     password,
-    confirmPassword,
   }: RegisterSchema) => {
-    const register = {
+    const bodyRequest = {
+      name,
       email,
+      salary: parseCurrencyToNumber(salary),
       password,
-      confirmPassword,
     };
-    console.log("register", register);
-    // setIsLoading(true);
-    // const res = await signIn('credentials', {
-    //   email,
-    //   password,
-    //   redirect: false,
-    // });
+    setIsLoading(true);
+    const responseRegister = await apiRequest<IRegisterUser>("/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bodyRequest),
+    });
 
-    // if (res?.ok) {
-    //   const session = await fetch('/api/auth/session').then(r => r.json());
+    if (responseRegister.success) {
+      CustomToast({
+        title: "Usuário criado com sucesso",
+        description: "Seja Bem vindo! Logue com sua conta para ter acesso",
+        status: "success",
+      });
 
-    //   if (session?.user?.username) {
-    //     localStorage.setItem('@loomi-username', session.user.username || '');
-    //   }
+      navigate("/login");
+    } else {
+      CustomToast({
+        title:
+          responseRegister?.errors[0] === "Cliente já existe"
+            ? "Este e-mail já está em uso"
+            : responseRegister?.errors[0],
+        description: "",
+        status: "error",
+      });
 
-    //   if (isRememberUser) {
-    //     localStorage.setItem(
-    //       '@loomi-remember-user',
-    //       JSON.stringify({ email, password, isRememberUser }),
-    //     );
-    //   }
-    //   CustomToast({
-    //     title: 'Usuário logado com sucesso',
-    //     description: 'Seja Bem vindo!',
-    //     status: 'success',
-    //   });
-
-    //   router.push('/dashboard');
-    // } else {
-    //   CustomToast({
-    //     title: 'Usuário ou senha inválidos',
-    //     description: ' ',
-    //     status: 'error',
-    //   });
-
-    setIsLoading(false);
-    // }
+      setIsLoading(false);
+    }
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col mb-[20px]">
-        <TextField
-          {...register("email")}
-          placeholder="e-mail*"
-          type="text"
-          required
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm pl-[15px]">
-            {errors.email.message}
-          </p>
-        )}
-        {!errors.email && (
-          <span className="text-[#C5C5C5] text-[12px] pl-[15px]">
-            Insira o seu e-mail
-          </span>
-        )}
-      </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <TextField {...register("name")} placeholder="Nome*" type="text" />
+      {errors.name && (
+        <p className="text-red-500 text-sm">{errors.name.message}</p>
+      )}
+
+      <TextField
+        {...register("email")}
+        placeholder="e-mail*"
+        type="email"
+        className="mt-[30px]"
+      />
+      {errors.email && (
+        <p className="text-red-500 text-sm ">{errors.email.message}</p>
+      )}
+      <TextField
+        {...register("salary", {
+          onChange: (e) => {
+            e.target.value = formatCurrency(e.target.value);
+          },
+        })}
+        placeholder="Salário"
+        type="text"
+        className="mt-[30px]"
+      />
+      {errors.email && (
+        <p className="text-red-500 text-sm ">{errors.salary?.message}</p>
+      )}
 
       <div className="flex flex-col relative mb-[30px]">
         <TextField
           {...register("password")}
           placeholder="Senha*"
           type={showPassword ? "text" : "password"}
-          required
-          className="mb-[30px]"
+          className="mt-[30px]"
         />
         {errors.password && (
-          <p className="text-red-500 text-sm pl-[15px]">
+          <p className="text-red-500 text-sm pl-[10px]">
             {errors.password.message}
           </p>
         )}
 
         <TextField
-          {...register("password")}
+          {...register("confirmPassword")}
           placeholder="Confirmar Senha*"
           type={showPassword ? "text" : "password"}
-          required
+          className="mt-[30px]"
         />
-        {errors.password && (
-          <p className="text-red-500 text-sm pl-[15px]">
-            {errors.password.message}
+        {errors.confirmPassword && (
+          <p className="text-red-500 text-sm pl-[10px]">
+            {errors.confirmPassword.message}
           </p>
         )}
 
