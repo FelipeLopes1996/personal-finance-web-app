@@ -5,67 +5,72 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../Button";
 import clsx from "clsx";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { apiRequest } from "../../utils/api-request";
+import CustomToast from "../CustomToast";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
-// interface UserForm {
-//   username: string;
-//   email: string;
-// }
 export default function LoginForm() {
+  const navigate = useNavigate();
+  const { setValue: setToken } = useLocalStorage<string | null>(
+    "@finance:token",
+    null
+  );
   const {
     register,
     handleSubmit,
-    // reset,
     formState: { errors },
   } = useForm<LoginSchema>({
     resolver: zodResolver(LoginSchema),
   });
-
   const [isLoading, setIsLoading] = useState(false);
-  const [isRememberUser, setIsRememberUser] = useState(false);
+  // const [isRememberUser, setIsRememberUser] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async ({ email, password }: LoginSchema) => {
-    const login = {
+    const bodyRequest = {
       email,
-      password,
+      passwordUser: password,
     };
-    console.log("login", login);
-    // setIsLoading(true);
-    // const res = await signIn('credentials', {
-    //   email,
-    //   password,
-    //   redirect: false,
-    // });
+    console.log("login", bodyRequest);
+    setIsLoading(true);
 
-    // if (res?.ok) {
-    //   const session = await fetch('/api/auth/session').then(r => r.json());
+    const loginSession = await apiRequest<string>("/auth", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bodyRequest),
+    });
 
-    //   if (session?.user?.username) {
-    //     localStorage.setItem('@loomi-username', session.user.username || '');
-    //   }
+    console.log("loginSession", loginSession);
 
-    //   if (isRememberUser) {
-    //     localStorage.setItem(
-    //       '@loomi-remember-user',
-    //       JSON.stringify({ email, password, isRememberUser }),
-    //     );
-    //   }
-    //   CustomToast({
-    //     title: 'Usuário logado com sucesso',
-    //     description: 'Seja Bem vindo!',
-    //     status: 'success',
-    //   });
+    if (loginSession.success) {
+      const { data } = loginSession;
+      setToken(data);
 
-    //   router.push('/dashboard');
-    // } else {
-    //   CustomToast({
-    //     title: 'Usuário ou senha inválidos',
-    //     description: ' ',
-    //     status: 'error',
-    //   });
+      // if (isRememberUser) {
+      //   localStorage.setItem(
+      //     "@loomi-remember-user",
+      //     JSON.stringify({ email, password, isRememberUser })
+      //   );
+      // }
+      setIsLoading(false);
+      CustomToast({
+        title: "Usuário logado com sucesso",
+        description: "Seja Bem vindo!",
+        status: "success",
+      });
+      navigate("/dashboard");
+    } else {
+      CustomToast({
+        title: "Usuário ou senha inválidos",
+        description: " ",
+        status: "error",
+      });
 
-    setIsLoading(false);
-    // }
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -111,7 +116,7 @@ export default function LoginForm() {
         </button>
       </div>
 
-      <div className="flex items-center justify-between text-gray-400 text-sm mb-[40px]">
+      {/* <div className="flex items-center justify-between text-gray-400 text-sm mb-[40px]">
         <label className="flex items-center gap-2 cursor-pointer text-[#C5C5C5]">
           <span className="relative w-5 h-5">
             <input
@@ -129,7 +134,7 @@ export default function LoginForm() {
         <a href="#" className="text-[#1876D2] hover:underline">
           Esqueci minha senha
         </a>
-      </div>
+      </div> */}
 
       <Button
         disabled={isLoading}
