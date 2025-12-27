@@ -9,11 +9,16 @@ import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../utils/api-request";
 import CustomToast from "../CustomToast";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { decodeJwt } from "../../utils/decodeJwt";
 
 export default function LoginForm() {
   const navigate = useNavigate();
   const { setValue: setToken } = useLocalStorage<string | null>(
     "@finance:token",
+    null
+  );
+  const { setValue: setUserId } = useLocalStorage<string | null>(
+    "@finance:userId",
     null
   );
   const {
@@ -32,7 +37,6 @@ export default function LoginForm() {
       email,
       passwordUser: password,
     };
-    console.log("login", bodyRequest);
     setIsLoading(true);
 
     const loginSession = await apiRequest<string>("/auth", {
@@ -43,11 +47,11 @@ export default function LoginForm() {
       body: JSON.stringify(bodyRequest),
     });
 
-    console.log("loginSession", loginSession);
-
     if (loginSession.success) {
       const { data } = loginSession;
       setToken(data);
+      const decodeToken = decodeJwt(data || "");
+      setUserId(JSON.stringify(decodeToken?.userId));
 
       // if (isRememberUser) {
       //   localStorage.setItem(

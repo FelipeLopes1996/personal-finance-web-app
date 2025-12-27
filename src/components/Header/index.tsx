@@ -1,12 +1,28 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { Button } from "../Button";
+import { clearStorage } from "../../utils/clearStorage";
 
 const Header = () => {
+  const navigate = useNavigate();
+  const { value: token } = useLocalStorage<string | null>(
+    "@finance:token",
+    null
+  );
+
+  const handleLogout = () => {
+    clearStorage();
+    navigate("/");
+  };
+
+  const validHomeRedirect = token ? "" : "/";
+
   return (
     <header className=" bg-teal-50">
       <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex-1 md:flex md:items-center md:gap-12">
-            <Link className="block text-teal-600" to="/">
+            <Link className="block text-teal-600" to={validHomeRedirect}>
               <span className="sr-only">Home</span>
               <svg
                 className="h-8"
@@ -21,24 +37,34 @@ const Header = () => {
               </svg>
             </Link>
           </div>
-
-          <div className="md:flex md:items-center md:gap-12">
-            <div className="flex items-center gap-4">
-              <Link
-                to="/login"
+          {token ? (
+            <div className="md:flex md:items-center md:gap-12">
+              <Button
+                onClick={handleLogout}
                 className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm"
               >
-                Entrar
-              </Link>
-
-              <Link
-                to="/register"
-                className="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600"
-              >
-                Registrar
-              </Link>
+                Sair
+              </Button>
             </div>
-          </div>
+          ) : (
+            <div className="md:flex md:items-center md:gap-12">
+              <div className="flex items-center gap-4">
+                <Link
+                  to="/login"
+                  className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm"
+                >
+                  Entrar
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600"
+                >
+                  Registrar
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

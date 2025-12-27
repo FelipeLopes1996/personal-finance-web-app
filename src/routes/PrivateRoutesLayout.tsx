@@ -1,7 +1,7 @@
 import { Outlet, Navigate } from "react-router-dom";
 
 export const PrivateRoutesLayout = () => {
-  const token = localStorage.getItem("@finance:token"); // ou sessionStorage
+  const token = localStorage.getItem("@finance:token");
 
   if (!token) {
     return <Navigate to="/login" replace />;
