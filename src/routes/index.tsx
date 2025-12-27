@@ -15,18 +15,18 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+    ],
+  },
+  {
+    element: <PrivateRoutesLayout />, // wrapper de rotas privadas
+    children: [
       {
-        element: <PrivateRoutesLayout />, // wrapper de rotas privadas
+        path: "dashboard",
+        element: <DashboardLayout />, // layout do dashboard
         children: [
-          {
-            path: "dashboard",
-            element: <DashboardLayout />, // layout do dashboard
-            children: [
-              { index: true, element: <Dashboard /> }, // /dashboard
-              // { path: "profile", element: <Profile /> },   // /dashboard/profile
-              // { path: "settings", element: <Settings /> }, // /dashboard/settings
-            ],
-          },
+          { index: true, element: <Dashboard /> }, // /dashboard
+          // { path: "profile", element: <Profile /> },   // /dashboard/profile
+          // { path: "settings", element: <Settings /> }, // /dashboard/settings
         ],
       },
     ],

@@ -30,7 +30,6 @@ export async function apiRequest<T>(
 
     //  lê o body apenas uma vez
     const rawBody = await res.text();
-    console.log("rawBody", rawBody);
 
     const data = contentType.includes("application/json")
       ? rawBody

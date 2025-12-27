@@ -2,6 +2,7 @@ type JwtPayload = {
   sub?: string;
   exp?: number;
   iat?: number;
+  userId?: number;
   roles?: string[];
   [key: string]: unknown;
 };

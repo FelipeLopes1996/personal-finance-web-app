@@ -1,7 +1,9 @@
 import { Outlet } from "react-router-dom";
 import Header from "../../components/Header";
+import { useAuthGuard } from "../../hooks/useAuthGuard";
 
 export default function MainLayout() {
+  useAuthGuard();
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
