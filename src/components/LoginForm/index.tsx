@@ -10,6 +10,7 @@ import { apiRequest } from "../../utils/api-request";
 import CustomToast from "../CustomToast";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { decodeJwt } from "../../utils/decodeJwt";
+import SpinnerLoading from "../SpinnerLoading";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -143,13 +144,12 @@ export default function LoginForm() {
       <Button
         disabled={isLoading}
         className={clsx(
-          isLoading && "!bg-blue-400 hover:cursor-default",
+          isLoading && "!bg-teal-700 hover:cursor-default",
           "hover:shadow-[0_0_15px_2px_#a1d1bd]"
         )}
         type="submit"
       >
-        {/* {isLoading ? <SpinnerLoading width="5" height="5" /> : "Entrar"} */}
-        {isLoading ? "..." : "Entrar"}
+        {isLoading ? <SpinnerLoading width="5" height="5" /> : "Entrar"}
       </Button>
     </form>
   );

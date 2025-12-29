@@ -6,6 +6,7 @@ import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
 import { PrivateRoutesLayout } from "./PrivateRoutesLayout";
 import DashboardLayout from "../pages/layouts/DashboardLayout";
+import Profile from "@/pages/Profile";
 
 export const router = createBrowserRouter([
   {
@@ -21,11 +22,10 @@ export const router = createBrowserRouter([
     element: <PrivateRoutesLayout />, // wrapper de rotas privadas
     children: [
       {
-        path: "dashboard",
         element: <DashboardLayout />, // layout do dashboard
         children: [
-          { index: true, element: <Dashboard /> }, // /dashboard
-          // { path: "profile", element: <Profile /> },   // /dashboard/profile
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "profile", element: <Profile /> },
           // { path: "settings", element: <Settings /> }, // /dashboard/settings
         ],
       },
