@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import CustomToast from "../CustomToast";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { parseCurrencyToNumber } from "../../utils/parseCurrencyToNumber";
+import VisibleIcon from "../../assets/visible.svg";
+import SpinnerLoading from "../SpinnerLoading";
 
 interface IRegisterUser {
   name: string;
@@ -134,20 +136,19 @@ export default function RegisterForm() {
           onClick={() => setShowPassword(!showPassword)}
           className="absolute right-3 top-3 text-gray-400 hover:cursor-pointer"
         >
-          {/* <VisibleIcon /> */}
+          <img src={VisibleIcon} alt="Visível" />
         </button>
       </div>
 
       <Button
         disabled={isLoading}
         className={clsx(
-          isLoading && "!bg-blue-400 hover:cursor-default",
+          isLoading && "!bg-teal-700 hover:cursor-default",
           "hover:shadow-[0_0_15px_2px_#a1d1bd]"
         )}
         type="submit"
       >
-        {/* {isLoading ? <SpinnerLoading width="5" height="5" /> : "Entrar"} */}
-        {isLoading ? "..." : "Registrar"}
+        {isLoading ? <SpinnerLoading width="5" height="5" /> : "Registrar"}
       </Button>
     </form>
   );

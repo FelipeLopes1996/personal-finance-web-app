@@ -3,9 +3,9 @@
   "compilerOptions": {
     "types": ["node"],
     "moduleResolution": "node",
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["src/*"]
     }
   },
   "references": [

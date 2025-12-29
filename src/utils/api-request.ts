@@ -12,7 +12,7 @@ type ApiRequestSuccess<T> = {
 
 export type ApiRequest<T> = ApiRequestError | ApiRequestSuccess<T>;
 
-export const apiUrl = "http://localhost:8090";
+export const apiUrl = import.meta.env.VITE_API_URL;
 
 export async function apiRequest<T>(
   path: string,
