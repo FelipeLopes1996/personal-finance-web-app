@@ -1,5 +1,6 @@
 import { api } from "@/api/axios";
 import { DashboardCard } from "@/components/DashboardCard/DashboardCard";
+import { Skeleton } from "@/components/Skeleton";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useQuery } from "@tanstack/react-query";
 
@@ -9,7 +10,7 @@ const Dashboard = () => {
     null
   );
   // const { data, isLoading, error } = useQuery({
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
       const response = await api.get(`/users/${userId}`);
@@ -18,11 +19,16 @@ const Dashboard = () => {
     retry: 3,
   });
 
-  const { name, salary } = data;
-
   return (
     <div>
-      <DashboardCard userName={name} userSalary={salary} />
+      {isLoading ? (
+        <>
+          <Skeleton className="h-[10rem] w-full" />
+          <Skeleton className="h-[10rem] w-full mt-6.5" />
+        </>
+      ) : (
+        <DashboardCard userName={data?.name} userSalary={data?.salary} />
+      )}
     </div>
   );
 };
