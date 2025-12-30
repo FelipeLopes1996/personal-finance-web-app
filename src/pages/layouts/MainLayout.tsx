@@ -7,7 +7,7 @@ export default function MainLayout() {
   return (
     <div className="h-screen flex flex-col">
       <Header />
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto pb-[4rem]">
         <Outlet />
       </main>
       <footer className="w-full py-8 bg-teal-50 mt-auto sticky bottom-0">
