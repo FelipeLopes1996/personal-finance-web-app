@@ -18,10 +18,10 @@ const Home = () => {
       <section className="py-10 md:py-15 bg-white">
         <div className="container mx-auto px-4 md:px-26">
           <div className="container mx-auto px-4 relative z-10 text-center">
-            <h2 className="text-[0.8rem] md:text-[1.7rem] font-extrabold mb-6 text-black leading-tight mx-auto">
+            <h2 className="text-[0.9rem] md:text-[1.7rem] font-extrabold mb-6 text-black leading-tight mx-auto">
               Tudo que Você Precisa para Dominar suas Finanças
             </h2>
-            <p className="text-[0.5rem]  md:text-[1rem] md:w-[100%] w-[80%] mb-6 mx-auto">
+            <p className="text-[0.7rem]  md:text-[1rem] md:w-[100%] w-[80%] mb-6 mx-auto">
               oferece ferramentas poderosas em uma interface amigável para você
               ter o controle total do seu dinheiro.
             </p>

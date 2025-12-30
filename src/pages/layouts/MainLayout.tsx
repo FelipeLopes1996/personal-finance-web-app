@@ -5,9 +5,10 @@ import { useAuthGuard } from "../../hooks/useAuthGuard";
 export default function MainLayout() {
   useAuthGuard();
   return (
-    <div className="min-h-screen flex flex-col">
+    // <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 overflow-y-auto">
         <Outlet />
       </main>
       <footer className="py-8 text-center bg-teal-50">
