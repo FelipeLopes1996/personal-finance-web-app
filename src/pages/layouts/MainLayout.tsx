@@ -11,7 +11,7 @@ export default function MainLayout() {
       <main className="flex-1 overflow-y-auto">
         <Outlet />
       </main>
-      <footer className="py-8 text-center bg-teal-50">
+      <footer className=" w-full py-8 text-center  bg-teal-50">
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center gap-2 mb-2">
             <span className="text-lg font-semibold  text-teal-600">
