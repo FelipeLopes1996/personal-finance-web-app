@@ -1,9 +1,8 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
-console.log("API URL:", import.meta.env.VITE_API_URL);
-console.log("MODE:", import.meta.env.MODE);
+
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  // timeout: 10000,
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
