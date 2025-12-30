@@ -7,7 +7,7 @@ export function Button({ ...props }: ButtonProps) {
     "w-full",
     "p-4",
     "bg-teal-600",
-    "rounded-[10px]",
+    "rounded-[6px]",
     "text-white",
     "cursor-pointer",
     "transition-colors",

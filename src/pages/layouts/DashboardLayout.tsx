@@ -8,17 +8,17 @@ export default function DashboardLayout() {
   useAuthGuard();
   return (
     <DashboardProvider>
-      <div className="min-h-screen flex flex-col">
+      <div className="h-screen flex flex-col">
         <Header />
-        <div className="flex flex-1 overflow-y-auto">
+        <div className="flex flex-1 overflow-y-auto ">
           <aside className="hidden md:flex">
             <Sidebar variant="sidebar" />
           </aside>
-          <main className="flex-1 p-7.5">
+          <main className="flex-1 p-7.5 pb-[4rem]">
             <Outlet />
           </main>
         </div>
-        <footer className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+        <footer className="md:hidden mt-auto sticky bottom-0">
           <Sidebar variant="footer" />
         </footer>
       </div>
