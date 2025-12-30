@@ -20,11 +20,10 @@ const Dashboard = () => {
   });
 
   return (
-    <div>
+    <div className="min-h-screen">
       {isLoading ? (
         <>
           <Skeleton className="h-[10rem] w-full" />
-          <Skeleton className="h-[10rem] w-full mt-6.5" />
         </>
       ) : (
         <DashboardCard userName={data?.name} userSalary={data?.salary} />
