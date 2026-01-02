@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import CustomToast from "../CustomToast";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { parseCurrencyToNumber } from "../../utils/parseCurrencyToNumber";
-import VisibleIcon from "../../assets/visible.svg";
 import SpinnerLoading from "../SpinnerLoading";
 
 interface IRegisterUser {
@@ -31,7 +30,6 @@ export default function RegisterForm() {
     resolver: zodResolver(RegisterSchema),
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async ({
     name,
@@ -110,7 +108,7 @@ export default function RegisterForm() {
         <TextField
           {...register("password")}
           placeholder="Senha*"
-          type={showPassword ? "text" : "password"}
+          type="password"
           className="mt-[30px]"
         />
         {errors.password && (
@@ -122,7 +120,7 @@ export default function RegisterForm() {
         <TextField
           {...register("confirmPassword")}
           placeholder="Confirmar Senha*"
-          type={showPassword ? "text" : "password"}
+          type="password"
           className="mt-[30px]"
         />
         {errors.confirmPassword && (
@@ -130,14 +128,6 @@ export default function RegisterForm() {
             {errors.confirmPassword.message}
           </p>
         )}
-
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-3 text-gray-400 hover:cursor-pointer"
-        >
-          <img src={VisibleIcon} alt="Visível" />
-        </button>
       </div>
 
       <Button

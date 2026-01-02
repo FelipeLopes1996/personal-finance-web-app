@@ -10,11 +10,11 @@ export default function DashboardLayout() {
     <DashboardProvider>
       <div className="h-screen flex flex-col">
         <Header />
-        <div className="flex flex-1 overflow-y-auto ">
+        <div className="flex flex-1 min-h-0">
           <aside className="hidden md:flex">
             <Sidebar variant="sidebar" />
           </aside>
-          <main className="flex-1 p-7.5 pb-[4rem]">
+          <main className="flex-1 p-7.5 pb-[1rem] overflow-y-auto">
             <Outlet />
           </main>
         </div>
