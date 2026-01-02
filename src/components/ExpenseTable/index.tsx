@@ -1,15 +1,8 @@
-import { Pencil, Plus, Trash } from "lucide-react";
-import { Button } from "../Button";
-
-interface Item {
-  id: number;
-  categoria: string;
-  descricao: string;
-  valor: number;
-}
+import { Pencil, Trash } from "lucide-react";
+import type { Expense } from "@/types/IExpense";
 
 interface ITableProps {
-  data: Item[];
+  data: Expense[];
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
 }
@@ -18,20 +11,10 @@ const HEADE_NAMES = ["Nome", "Descrição", "Valor", "Ações"];
 
 const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
   return (
-    <div className="w-full mt-[2rem] rounded-[4px] bg-white p-[2px] shadow-md">
-      <div className="flex items-center justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md ">
-        <h2 className="text-[1rem] md:text-[1.5rem]">Gastos atuais</h2>
-        <div>
-          <Button className="flex gap-1.5 items-center p-[0.8rem]">
-            {" "}
-            <Plus size={20} />
-            Adicionar
-          </Button>
-        </div>
-      </div>
+    <>
       {/* Desktop */}
       <div className="hidden md:block">
-        <table className="w-full min-w-max table-auto text-left rounded-[4px] bg-white p-6 shadow-md">
+        <table className="w-full min-w-max table-auto text-left bg-white  shadow-md">
           <thead>
             <tr>
               {HEADE_NAMES.map((name) => (
@@ -48,12 +31,10 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
           <tbody className="bg-white divide-y divide-gray-200">
             {data.map((item) => (
               <tr key={item.id} className="hover:bg-gray-100">
-                <td className="px-4 py-2 whitespace-nowrap">
-                  {item.categoria}
-                </td>
-                <td className="px-4 py-2">{item.descricao}</td>
+                <td className="px-4 py-2 whitespace-nowrap">{item.name}</td>
+                <td className="px-4 py-2">{item.description}</td>
                 <td className="px-4 py-2">
-                  {item.valor.toLocaleString("pt-BR", {
+                  {item.value.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}
@@ -86,14 +67,16 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
             className="border border-gray-200 rounded p-4 shadow-sm bg-white"
           >
             <p>
-              <span className="font-semibold">Categoria:</span> {item.categoria}
+              <span className="font-semibold">Categoria:</span>{" "}
+              {item.categoryId}
             </p>
             <p>
-              <span className="font-semibold">Descrição:</span> {item.descricao}
+              <span className="font-semibold">Descrição:</span>{" "}
+              {item.description}
             </p>
             <p>
               <span className="font-semibold">Valor:</span>{" "}
-              {item.valor.toLocaleString("pt-BR", {
+              {item.value.toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               })}
@@ -115,24 +98,8 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 };
 
-// Exemplo de uso
-const Example = () => {
-  const data: Item[] = [
-    { id: 1, categoria: "Alimentação", descricao: "Mercado", valor: 250 },
-    { id: 2, categoria: "Transporte", descricao: "Combustível", valor: 150 },
-    { id: 3, categoria: "Lazer", descricao: "Cinema", valor: 50 },
-  ];
-
-  const handleEdit = (id: number) => console.log("Editar", id);
-  const handleDelete = (id: number) => console.log("Deletar", id);
-
-  return (
-    <ExpenseTable data={data} onEdit={handleEdit} onDelete={handleDelete} />
-  );
-};
-
-export { Example, ExpenseTable };
+export default ExpenseTable;
