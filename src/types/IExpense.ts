@@ -1,12 +1,13 @@
-export interface Expense {
+export interface IExpense {
   id: number;
   name: string;
-  description: string;
+  description?: string;
   value: number;
-  categoryId: number;
+  categoryId?: number;
 }
 
-export interface ICreateExpense {
+export interface ICreateOrEditExpense {
+  id?: number;
   name: string;
   description?: string;
   value: number;
