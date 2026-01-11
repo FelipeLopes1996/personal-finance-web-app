@@ -1,6 +1,8 @@
 export function formatCurrency(value: string, isInput = true) {
   const onlyNumbers = value.replace(/\D/g, "");
 
+  if (!onlyNumbers) return "";
+
   const number = isInput ? Number(onlyNumbers) / 100 : Number(onlyNumbers);
 
   return number.toLocaleString("pt-BR", {

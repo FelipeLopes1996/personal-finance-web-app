@@ -5,3 +5,9 @@ export interface Expense {
   value: number;
   categoryId: number;
 }
+
+export interface ICreateExpense {
+  name: string;
+  description?: string;
+  value: number;
+}

@@ -2,11 +2,12 @@ import { api } from "@/api/axios";
 import { Button } from "@/components/Button";
 import CustomToast from "@/components/CustomToast";
 import { DashboardCard } from "@/components/DashboardCard/DashboardCard";
+import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseTable from "@/components/ExpenseTable";
 import Modal from "@/components/Modal";
 import { Skeleton } from "@/components/Skeleton";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import type { Expense } from "@/types/IExpense";
+import type { Expense, ICreateExpense } from "@/types/IExpense";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -17,9 +18,11 @@ const Dashboard = () => {
     null
   );
   const queryClient = useQueryClient();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
+  const [isOpenCreateOrEditModal, setIsOpenCreateOrEditModal] =
+    useState<boolean>(false);
+
   const [expenseId, setExpenseId] = useState<number>(0);
-  // const { data, isLoading, error } = useQuery({
   const { data, isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
@@ -49,13 +52,42 @@ const Dashboard = () => {
         title: "Gasto excluído com sucesso!",
         status: "success",
       });
-      setIsOpen(false);
+      setExpenseId(0);
+      setIsOpenDeleteModal(false);
+    },
+    onError: (response) => {
+      console.log(response);
     },
   });
 
+  const createExpenseMutation = useMutation({
+    mutationFn: async (payload: ICreateExpense): Promise<void> => {
+      await api.post(`/expenses`, payload);
+    },
+    onSuccess: () => {
+      // Atualiza a lista após deletar
+      queryClient.invalidateQueries({
+        queryKey: ["expenses"],
+      });
+      CustomToast({
+        title: "Gasto adicionado com sucesso!",
+        status: "success",
+      });
+      setIsOpenCreateOrEditModal(false);
+    },
+    onError: (response) => {
+      console.log(response);
+    },
+  });
+
+  const handleOrEditCreate = () => {
+    setIsOpenCreateOrEditModal(true);
+  };
+
   const handleEdit = (id: number) => console.log("Editar", id);
+
   const handleDelete = (id: number) => {
-    setIsOpen(true);
+    setIsOpenDeleteModal(true);
     setExpenseId(id);
     console.log("Deletar", id);
   };
@@ -79,7 +111,10 @@ const Dashboard = () => {
                   Gastos atuais
                 </h2>
                 <div>
-                  <Button className="flex gap-1.5 items-center p-[0.8rem]">
+                  <Button
+                    className="flex gap-1.5 items-center p-[0.8rem]"
+                    onClick={handleOrEditCreate}
+                  >
                     {" "}
                     <Plus size={20} />
                     Adicionar
@@ -109,14 +144,27 @@ const Dashboard = () => {
         </>
       )}
       <Modal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        isOpen={isOpenDeleteModal}
+        onClose={() => setIsOpenDeleteModal(false)}
         title="Excluir Gasto"
         confirmText="Excluir"
         onConfirm={() => deleteExpenseMutation.mutate()}
         isLoading={deleteExpenseMutation.isPending}
       >
         <p>Deseja realmente excluir este gasto?</p>
+      </Modal>
+      <Modal
+        isOpen={isOpenCreateOrEditModal}
+        onClose={() => setIsOpenCreateOrEditModal(false)}
+        title="Adicionar Gasto"
+        confirmText="Criar"
+        onConfirm={() => deleteExpenseMutation.mutate()}
+        isLoading={deleteExpenseMutation.isPending}
+      >
+        <ExpenseForm
+          isLoading={createExpenseMutation.isPending || false}
+          sendCreateOrEditExpense={createExpenseMutation.mutate}
+        />
       </Modal>
     </div>
   );

@@ -49,15 +49,21 @@ const Modal = ({
         <div className="text-sm text-gray-700">{children}</div>
 
         {/* Footer */}
-        <div className="mt-6 flex justify-end gap-[1rem]">
-          <Button textButton="text" onClick={onClose}>
-            Fechar
-          </Button>
-          <Button disabled={isLoading} onClick={onConfirm}>
-            {" "}
-            {isLoading ? <SpinnerLoading width="5" height="5" /> : confirmText}
-          </Button>
-        </div>
+        {title?.includes("Adicionar") ? null : (
+          <div className="mt-6 flex justify-end gap-[1rem]">
+            <Button textButton="text" onClick={onClose} className="w-max">
+              Fechar
+            </Button>
+            <Button disabled={isLoading} onClick={onConfirm} className="w-max">
+              {" "}
+              {isLoading ? (
+                <SpinnerLoading width="5" height="5" />
+              ) : (
+                confirmText
+              )}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
