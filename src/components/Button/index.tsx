@@ -1,17 +1,21 @@
 import clsx from "clsx";
+import type React from "react";
 
-type ButtonProps = React.ComponentProps<"button">;
+interface IButton extends React.ComponentProps<"button"> {
+  textButton?: "text" | "outline";
+}
 
-export function Button({ ...props }: ButtonProps) {
+export function Button({ textButton = "outline", ...props }: IButton) {
+  const baseStyle =
+    "w-full p-2.5 cursor-pointer transition-colors rounded-[6px]";
+
+  const variants = {
+    text: "bg-white text-teal-600 hover:bg-teal-50",
+    outline: "text-white bg-teal-600",
+  };
+
   const buttonClasses = clsx(
-    "w-full",
-    "p-4",
-    "bg-teal-600",
-    "rounded-[10px]",
-    "text-white",
-    "cursor-pointer",
-    "transition-colors",
-    props.className
+    `${baseStyle} ${variants[textButton]} ${props.className ?? ""}`
   );
 
   return <button {...props} className={buttonClasses} />;

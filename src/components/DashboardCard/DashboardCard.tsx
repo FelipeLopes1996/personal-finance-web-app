@@ -1,3 +1,5 @@
+import { formatCurrency } from "@/utils/formatCurrency";
+
 type CardType = {
   userName?: string;
   userSalary?: number;
@@ -10,7 +12,7 @@ export function DashboardCard({
 }: // userExpenses,
 CardType) {
   return (
-    <div className="w-full  rounded-[4px] bg-white p-6 shadow-md">
+    <div className="w-full rounded-[4px] bg-white p-6 shadow-md">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -28,7 +30,7 @@ CardType) {
         <div>
           <p className="text-sm text-gray-500">Salário mensal</p>
           <p className="text-lg font-bold text-green-600">
-            {userSalary || "0"}
+            {formatCurrency(String(userSalary || 0), false)}
           </p>
         </div>
 
