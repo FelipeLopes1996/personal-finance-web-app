@@ -9,8 +9,9 @@ interface IModal {
   onConfirm: () => void;
   title?: string;
   children?: ReactNode;
-  confirmText: string;
+  confirmText?: string;
   isLoading?: boolean;
+  isForm?: boolean;
 }
 
 const Modal = ({
@@ -21,6 +22,7 @@ const Modal = ({
   children,
   confirmText,
   isLoading,
+  isForm = false,
 }: IModal) => {
   if (!isOpen) return null;
   return (
@@ -29,7 +31,7 @@ const Modal = ({
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+      <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg m-4 sm:m-0">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
           {title && (
@@ -49,7 +51,7 @@ const Modal = ({
         <div className="text-sm text-gray-700">{children}</div>
 
         {/* Footer */}
-        {title?.includes("Adicionar") ? null : (
+        {isForm ? null : (
           <div className="mt-6 flex justify-end gap-[1rem]">
             <Button textButton="text" onClick={onClose} className="w-max">
               Fechar

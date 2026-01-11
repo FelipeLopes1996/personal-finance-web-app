@@ -1,9 +1,9 @@
 import { Pencil, Trash } from "lucide-react";
-import type { Expense } from "@/types/IExpense";
+import type { IExpense } from "@/types/IExpense";
 
 interface ITableProps {
-  data: Expense[];
-  onEdit: (id: number) => void;
+  data: IExpense[];
+  onEdit: (edit: IExpense) => void;
   onDelete: (id: number) => void;
 }
 
@@ -32,7 +32,7 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
             {data.map((item) => (
               <tr key={item.id} className="hover:bg-gray-100">
                 <td className="px-4 py-2 whitespace-nowrap">{item.name}</td>
-                <td className="px-4 py-2">{item.description}</td>
+                <td className="px-4 py-2">{item.description || "-"}</td>
                 <td className="px-4 py-2">
                   {item.value.toLocaleString("pt-BR", {
                     style: "currency",
@@ -41,7 +41,14 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
                 </td>
                 <td className="px-4 py-2 flex gap-2">
                   <button
-                    onClick={() => onEdit(item.id)}
+                    onClick={() =>
+                      onEdit({
+                        id: item.id,
+                        name: item.name,
+                        description: item.description,
+                        value: item.value,
+                      })
+                    }
                     className="px-2 py-1  text-white rounded hover:bg-blue-100 transition cursor-pointer"
                   >
                     <Pencil size={20} className="text-blue-500" />
@@ -67,13 +74,14 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
             className="border border-gray-200 rounded p-4 shadow-sm bg-white"
           >
             <p>
-              <span className="font-semibold">Categoria:</span>{" "}
-              {item.categoryId}
+              <span className="font-semibold">Nome:</span> {item.name}
             </p>
-            <p>
-              <span className="font-semibold">Descrição:</span>{" "}
-              {item.description}
-            </p>
+            {item.description ? (
+              <p>
+                <span className="font-semibold">Descrição:</span>{" "}
+                {item.description || "-"}
+              </p>
+            ) : null}
             <p>
               <span className="font-semibold">Valor:</span>{" "}
               {item.value.toLocaleString("pt-BR", {
@@ -83,7 +91,14 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
             </p>
             <div className="flex gap-2 mt-2">
               <button
-                onClick={() => onEdit(item.id)}
+                onClick={() =>
+                  onEdit({
+                    id: item.id,
+                    name: item.name,
+                    description: item.description,
+                    value: item.value,
+                  })
+                }
                 className="flex-1 px-2 py-1 flex justify-center items-center rounded hover:bg-blue-100 transition cursor-pointer"
               >
                 <Pencil size={20} className="text-blue-500" />
