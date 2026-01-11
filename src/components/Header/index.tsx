@@ -5,17 +5,20 @@ import { clearStorage } from "../../utils/clearStorage";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { value: token } = useLocalStorage<string | null>(
+  const { value: token, setValue: setToken } = useLocalStorage<string | null>(
     "@finance:token",
     null
   );
 
   const handleLogout = () => {
+    setToken("");
     clearStorage();
     navigate("/");
   };
 
   const validHomeRedirect = token ? "" : "/";
+
+  // console.log("token", token);
 
   return (
     <header className=" bg-teal-50">
