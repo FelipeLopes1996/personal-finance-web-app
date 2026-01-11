@@ -7,7 +7,8 @@ import ExpenseTable from "@/components/ExpenseTable";
 import Modal from "@/components/Modal";
 import { Skeleton } from "@/components/Skeleton";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import type { Expense, ICreateExpense } from "@/types/IExpense";
+import type { ICreateOrEditExpense, IExpense } from "@/types/IExpense";
+import { formatCurrency } from "@/utils/formatCurrency";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -21,6 +22,9 @@ const Dashboard = () => {
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
   const [isOpenCreateOrEditModal, setIsOpenCreateOrEditModal] =
     useState<boolean>(false);
+  const [editExpenseValues, setEditExpenseValues] = useState<IExpense | null>(
+    null
+  );
 
   const [expenseId, setExpenseId] = useState<number>(0);
   const { data, isLoading } = useQuery({
@@ -33,7 +37,7 @@ const Dashboard = () => {
 
   const { data: dataExpense, isLoading: dataExpenseIsLoading } = useQuery({
     queryKey: ["expenses"],
-    queryFn: async (): Promise<Expense[]> => {
+    queryFn: async (): Promise<IExpense[]> => {
       const response = await api.get(`/expenses`);
       return response.data;
     },
@@ -44,7 +48,6 @@ const Dashboard = () => {
       await api.delete(`/expenses/${expenseId}`);
     },
     onSuccess: () => {
-      // Atualiza a lista após deletar
       queryClient.invalidateQueries({
         queryKey: ["expenses"],
       });
@@ -61,7 +64,7 @@ const Dashboard = () => {
   });
 
   const createExpenseMutation = useMutation({
-    mutationFn: async (payload: ICreateExpense): Promise<void> => {
+    mutationFn: async (payload: ICreateOrEditExpense): Promise<void> => {
       await api.post(`/expenses`, payload);
     },
     onSuccess: () => {
@@ -80,19 +83,44 @@ const Dashboard = () => {
     },
   });
 
+  const editExpenseMutation = useMutation({
+    mutationFn: async (payload: ICreateOrEditExpense): Promise<void> => {
+      await api.put(`/expenses/${editExpenseValues?.id}`, payload);
+    },
+    onSuccess: () => {
+      // Atualiza a lista após deletar
+      queryClient.invalidateQueries({
+        queryKey: ["expenses"],
+      });
+      CustomToast({
+        title: "Gasto salvo com sucesso!",
+        status: "success",
+      });
+      setIsOpenCreateOrEditModal(false);
+    },
+    onError: (response) => {
+      console.log(response);
+    },
+  });
+
   const handleOrEditCreate = () => {
     setIsOpenCreateOrEditModal(true);
   };
 
-  const handleEdit = (id: number) => console.log("Editar", id);
+  const handleEdit = (edit: IExpense) => {
+    setEditExpenseValues(edit);
+    setIsOpenCreateOrEditModal(true);
+  };
 
   const handleDelete = (id: number) => {
     setIsOpenDeleteModal(true);
     setExpenseId(id);
-    console.log("Deletar", id);
   };
 
-  console.log("dataExpense", dataExpense);
+  const handleCloseCreateOrEdit = () => {
+    setEditExpenseValues(null);
+    setIsOpenCreateOrEditModal(false);
+  };
 
   return (
     <div className="flex flex-col ">
@@ -133,7 +161,10 @@ const Dashboard = () => {
                 Você ainda não possui gastos
               </h2>
               <div>
-                <Button className="flex gap-1.5 items-center p-[0.8rem] text-[0.8rem] md:text-[1rem]">
+                <Button
+                  onClick={handleOrEditCreate}
+                  className="flex gap-1.5 items-center p-[0.8rem] text-[0.8rem] md:text-[1rem]"
+                >
                   {" "}
                   <Plus size={20} />
                   Adicionar
@@ -155,15 +186,35 @@ const Dashboard = () => {
       </Modal>
       <Modal
         isOpen={isOpenCreateOrEditModal}
-        onClose={() => setIsOpenCreateOrEditModal(false)}
-        title="Adicionar Gasto"
-        confirmText="Criar"
+        isForm={true}
+        onClose={handleCloseCreateOrEdit}
+        title={editExpenseValues ? "Editar Gasto" : "Adicionar Gasto"}
         onConfirm={() => deleteExpenseMutation.mutate()}
         isLoading={deleteExpenseMutation.isPending}
       >
         <ExpenseForm
-          isLoading={createExpenseMutation.isPending || false}
-          sendCreateOrEditExpense={createExpenseMutation.mutate}
+          isLoading={
+            createExpenseMutation.isPending ||
+            editExpenseMutation.isPending ||
+            false
+          }
+          sendCreateOrEditExpense={
+            editExpenseValues
+              ? editExpenseMutation.mutate
+              : createExpenseMutation.mutate
+          }
+          defaultValues={
+            editExpenseValues
+              ? {
+                  name: editExpenseValues?.name,
+                  description: editExpenseValues?.description ?? "",
+                  value: formatCurrency(
+                    String(editExpenseValues?.value || 0),
+                    false
+                  ),
+                }
+              : undefined
+          }
         />
       </Modal>
     </div>

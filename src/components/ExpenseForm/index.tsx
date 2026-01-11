@@ -7,24 +7,35 @@ import { parseCurrencyToNumber } from "@/utils/parseCurrencyToNumber";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { Button } from "../Button";
 import SpinnerLoading from "../SpinnerLoading";
-import type { ICreateExpense } from "@/types/IExpense";
+import type { ICreateOrEditExpense } from "@/types/IExpense";
+import { useEffect } from "react";
 
 interface IExpenseForm {
   isLoading: boolean;
-  sendCreateOrEditExpense: (data: ICreateExpense) => void;
+  sendCreateOrEditExpense: (data: ICreateOrEditExpense) => void;
+  defaultValues?: Partial<ExpenseSchemaType> | undefined;
 }
 
 export default function ExpenseForm({
   isLoading,
   sendCreateOrEditExpense,
+  defaultValues,
 }: IExpenseForm) {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<ExpenseSchemaType>({
     resolver: zodResolver(ExpenseSchema),
+    defaultValues,
   });
+
+  useEffect(() => {
+    if (defaultValues) {
+      reset(defaultValues);
+    }
+  }, [defaultValues, reset]);
 
   const onSubmit = async ({ name, description, value }: ExpenseSchemaType) => {
     const bodyRequest = {
@@ -33,9 +44,10 @@ export default function ExpenseForm({
       value: parseCurrencyToNumber(value),
     };
     if (errors.description || errors.name || errors.value) return;
-
     sendCreateOrEditExpense(bodyRequest);
   };
+
+  const btnText = defaultValues ? "Salvar" : "Adicionar";
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -80,11 +92,7 @@ export default function ExpenseForm({
       )} */}
 
       <Button disabled={isLoading} className="mt-[30px]" type="submit">
-        {isLoading ? (
-          <SpinnerLoading width="5" height="5" />
-        ) : (
-          "Cadastrar gasto"
-        )}
+        {isLoading ? <SpinnerLoading width="5" height="5" /> : btnText}
       </Button>
     </form>
   );
