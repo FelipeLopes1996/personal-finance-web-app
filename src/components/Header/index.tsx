@@ -2,8 +2,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { Button } from "../Button";
 import { clearStorage } from "../../utils/clearStorage";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 
 const Header = () => {
+  useAuthGuard();
   const navigate = useNavigate();
   const { value: token, setValue: setToken } = useLocalStorage<string | null>(
     "@finance:token",
@@ -18,11 +20,9 @@ const Header = () => {
 
   const validHomeRedirect = token ? "" : "/";
 
-  // console.log("token", token);
-
   return (
-    <header className=" bg-teal-50">
-      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+    <header className=" bg-teal-50 border-b-1 border-[#e5e5e5]">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex-1 md:flex md:items-center md:gap-12">
             <Link className="block text-teal-600" to={validHomeRedirect}>

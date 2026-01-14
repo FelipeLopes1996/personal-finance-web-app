@@ -7,6 +7,7 @@ import Dashboard from "../pages/Dashboard";
 import { PrivateRoutesLayout } from "./PrivateRoutesLayout";
 import DashboardLayout from "../pages/layouts/DashboardLayout";
 import Profile from "@/pages/Profile";
+import Category from "@/pages/Category";
 
 export const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <Dashboard /> },
           { path: "profile", element: <Profile /> },
+          { path: "category", element: <Category /> },
           // { path: "settings", element: <Settings /> }, // /dashboard/settings
         ],
       },

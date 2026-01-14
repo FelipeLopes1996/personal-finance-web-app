@@ -5,6 +5,7 @@ import { DashboardCard } from "@/components/DashboardCard/DashboardCard";
 import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseTable from "@/components/ExpenseTable";
 import Modal from "@/components/Modal";
+import NoDataContent from "@/components/NoDataContent";
 import { Skeleton } from "@/components/Skeleton";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import type { ICreateOrEditExpense, IExpense } from "@/types/IExpense";
@@ -131,6 +132,7 @@ const Dashboard = () => {
         </>
       ) : (
         <>
+          <h1 className="text-[2rem] mb-[2rem]">Dashboard</h1>
           <DashboardCard userName={data?.name} userSalary={data?.salary} />
           {dataExpense?.length ? (
             <div className="w-full mt-[2rem] bg-white rounded-[4px] overflow-hidden md:shadow-md">
@@ -156,28 +158,17 @@ const Dashboard = () => {
               />
             </div>
           ) : (
-            <div className="w-full flex flex-col items-center justify-center gap-2.5 rounded-[4px] mt-[4rem]">
-              <h2 className="text-[0.9rem] md:text-[1.2rem] font-semibold">
-                Você ainda não possui gastos
-              </h2>
-              <div>
-                <Button
-                  onClick={handleOrEditCreate}
-                  className="flex gap-1.5 items-center p-[0.8rem] text-[0.8rem] md:text-[1rem]"
-                >
-                  {" "}
-                  <Plus size={20} />
-                  Adicionar
-                </Button>
-              </div>
-            </div>
+            <NoDataContent
+              handleAction={handleOrEditCreate}
+              title="Você ainda não possui gastos"
+            />
           )}
         </>
       )}
       <Modal
         isOpen={isOpenDeleteModal}
         onClose={() => setIsOpenDeleteModal(false)}
-        title="Excluir Gasto"
+        title="Excluir gasto"
         confirmText="Excluir"
         onConfirm={() => deleteExpenseMutation.mutate()}
         isLoading={deleteExpenseMutation.isPending}
