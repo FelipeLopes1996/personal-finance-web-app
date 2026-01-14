@@ -1,4 +1,4 @@
-import { Home, User } from "lucide-react";
+import { Home, TableOfContents } from "lucide-react";
 import clsx from "clsx";
 import { NavItem } from "../NavItem";
 
@@ -25,11 +25,17 @@ export default function Sidebar({ variant }: SidebarProps) {
         isFooter={isFooter}
       />
       <NavItem
+        to="/category"
+        icon={<TableOfContents />}
+        label="Categoria"
+        isFooter={isFooter}
+      />
+      {/* <NavItem
         to="/profile"
         icon={<User />}
         label="Perfil"
         isFooter={isFooter}
-      />
+      /> */}
       {/* <NavItem
         to="/settings"
         icon={<Settings />}
