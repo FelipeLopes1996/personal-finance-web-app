@@ -14,7 +14,7 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
     <>
       {/* Desktop */}
       <div className="hidden md:block">
-        <table className="w-full min-w-max table-auto text-left bg-white  shadow-md">
+        <table className="w-full min-w-max table-auto text-left bg-white shadow-md">
           <thead>
             <tr>
               {HEADE_NAMES.map((name) => (
