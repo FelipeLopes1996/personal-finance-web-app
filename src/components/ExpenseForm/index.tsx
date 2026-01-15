@@ -8,7 +8,6 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { Button } from "../Button";
 import SpinnerLoading from "../SpinnerLoading";
 import type { ICreateOrEditExpense } from "@/types/IExpense";
-import { useEffect } from "react";
 
 interface IExpenseForm {
   isLoading: boolean;
@@ -25,17 +24,10 @@ export default function ExpenseForm({
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<ExpenseSchemaType>({
     resolver: zodResolver(ExpenseSchema),
     defaultValues,
   });
-
-  useEffect(() => {
-    if (defaultValues) {
-      reset(defaultValues);
-    }
-  }, [defaultValues, reset]);
 
   const onSubmit = async ({ name, description, value }: ExpenseSchemaType) => {
     const bodyRequest = {

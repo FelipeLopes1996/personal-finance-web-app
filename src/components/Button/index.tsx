@@ -7,7 +7,7 @@ interface IButton extends React.ComponentProps<"button"> {
 
 export function Button({ textButton = "outline", ...props }: IButton) {
   const baseStyle =
-    "w-full p-2.5 cursor-pointer transition-colors rounded-[6px]";
+    "w-full p-3.5 cursor-pointer transition-colors rounded-[6px]";
 
   const variants = {
     text: "bg-white text-teal-600 hover:bg-teal-50",
