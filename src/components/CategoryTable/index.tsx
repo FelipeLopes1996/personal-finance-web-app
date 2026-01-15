@@ -34,18 +34,19 @@ const CategoryTable = ({ data, onEdit, onDelete }: ITableProps) => {
                 <td className="px-4 py-2 whitespace-nowrap">{item.name}</td>
                 <td className="px-4 py-2 w-[20%]">
                   <button
-                    onClick={() =>
+                    onClick={() => {
+                      if (!item.id) return;
                       onEdit({
                         id: item.id,
                         name: item.name,
-                      })
-                    }
+                      });
+                    }}
                     className="px-2 py-1 mr-[0.5rem] text-white rounded hover:bg-blue-100 transition cursor-pointer"
                   >
                     <Pencil size={20} className="text-blue-500" />
                   </button>
                   <button
-                    onClick={() => onDelete(item.id)}
+                    onClick={() => onDelete(item.id || 0)}
                     className="px-2 py-1  text-white rounded hover:bg-red-100 transition cursor-pointer"
                   >
                     <Trash size={20} className="text-red-500" />
@@ -69,18 +70,19 @@ const CategoryTable = ({ data, onEdit, onDelete }: ITableProps) => {
             </p>
             <div className="flex gap-2 mt-2">
               <button
-                onClick={() =>
+                onClick={() => {
+                  if (!item.id) return;
                   onEdit({
                     id: item.id,
                     name: item.name,
-                  })
-                }
+                  });
+                }}
                 className="flex-1 px-2 py-1 flex justify-center items-center rounded hover:bg-blue-100 transition cursor-pointer"
               >
                 <Pencil size={20} className="text-blue-500" />
               </button>
               <button
-                onClick={() => onDelete(item.id)}
+                onClick={() => onDelete(item.id || 0)}
                 className="flex-1 px-2 py-1 flex justify-center items-center rounded hover:bg-red-100 transition cursor-pointer"
               >
                 <Trash size={20} className="text-red-500" />
