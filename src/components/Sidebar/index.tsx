@@ -27,7 +27,7 @@ export default function Sidebar({ variant }: SidebarProps) {
       <NavItem
         to="/category"
         icon={<TableOfContents />}
-        label="Categoria"
+        label="Categorias"
         isFooter={isFooter}
       />
       {/* <NavItem

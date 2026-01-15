@@ -138,7 +138,7 @@ const Dashboard = () => {
             <div className="w-full mt-[2rem] bg-white rounded-[4px] overflow-hidden md:shadow-md">
               <div className="flex items-center justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md ">
                 <h2 className="text-[1.2rem] md:text-[1.5rem]">
-                  Gastos atuais
+                  Lista de gastos
                 </h2>
                 <div>
                   <Button
