@@ -180,7 +180,7 @@ const Dashboard = () => {
         isForm={true}
         onClose={handleCloseCreateOrEdit}
         title={editExpenseValues ? "Editar Gasto" : "Adicionar Gasto"}
-        onConfirm={() => deleteExpenseMutation.mutate()}
+        onConfirm={() => {}}
         isLoading={deleteExpenseMutation.isPending}
       >
         <ExpenseForm
