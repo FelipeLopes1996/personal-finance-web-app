@@ -8,17 +8,21 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { Button } from "../Button";
 import SpinnerLoading from "../SpinnerLoading";
 import type { ICreateOrEditExpense } from "@/types/IExpense";
+import { SelectField } from "../SelectField";
+import type { ICategory } from "@/types/ICategory";
 
 interface IExpenseForm {
   isLoading: boolean;
   sendCreateOrEditExpense: (data: ICreateOrEditExpense) => void;
   defaultValues?: Partial<ExpenseSchemaType> | undefined;
+  categories: ICategory[] | [];
 }
 
 export default function ExpenseForm({
   isLoading,
   sendCreateOrEditExpense,
   defaultValues,
+  categories,
 }: IExpenseForm) {
   const {
     register,
@@ -29,17 +33,28 @@ export default function ExpenseForm({
     defaultValues,
   });
 
-  const onSubmit = async ({ name, description, value }: ExpenseSchemaType) => {
+  const onSubmit = async ({
+    name,
+    description,
+    value,
+    categoryId,
+  }: ExpenseSchemaType) => {
     const bodyRequest = {
       name,
       description,
       value: parseCurrencyToNumber(value),
+      categoryId: categoryId === 0 ? null : categoryId,
     };
+    console.log(bodyRequest);
     if (errors.description || errors.name || errors.value) return;
     sendCreateOrEditExpense(bodyRequest);
   };
 
   const btnText = defaultValues ? "Salvar" : "Adicionar";
+
+  const getCategoryNames = categories?.length
+    ? categories.map(({ id, name }) => ({ value: id, label: name }))
+    : [];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -71,17 +86,14 @@ export default function ExpenseForm({
       )}
 
       {/* Categoria */}
-      {/* <TextField
-        {...register("categoryId", { valueAsNumber: true })}
-        placeholder="Categoria*"
-        type="number"
+      <SelectField
+        {...register("categoryId", {
+          valueAsNumber: true,
+        })}
         className="mt-[30px]"
+        optionSelectText="Selecione uma categoria"
+        options={getCategoryNames}
       />
-      {errors.categoryId && (
-        <p className="text-red-500 text-sm">
-          {errors.categoryId.message}
-        </p>
-      )} */}
 
       <Button disabled={isLoading} className="mt-[30px]" type="submit">
         {isLoading ? <SpinnerLoading width="5" height="5" /> : btnText}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { api } from "@/api/axios";
 import { Button } from "@/components/Button";
 import CustomToast from "@/components/CustomToast";
@@ -8,7 +9,10 @@ import Modal from "@/components/Modal";
 import NoDataContent from "@/components/NoDataContent";
 import { Skeleton } from "@/components/Skeleton";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import type { ICategory } from "@/types/ICategory";
 import type { ICreateOrEditExpense, IExpense } from "@/types/IExpense";
+import type { IPageResponse } from "@/types/IPageResponse";
+import { PER_PAGE } from "@/utils/constants";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -17,15 +21,17 @@ import { useState } from "react";
 const Dashboard = () => {
   const { value: userId } = useLocalStorage<string | null>(
     "@finance:userId",
-    null
+    null,
   );
   const queryClient = useQueryClient();
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
   const [isOpenCreateOrEditModal, setIsOpenCreateOrEditModal] =
     useState<boolean>(false);
   const [editExpenseValues, setEditExpenseValues] = useState<IExpense | null>(
-    null
+    null,
   );
+  const [page, setPage] = useState(0);
+  const size = PER_PAGE;
 
   const [expenseId, setExpenseId] = useState<number>(0);
   const { data, isLoading } = useQuery({
@@ -36,11 +42,29 @@ const Dashboard = () => {
     },
   });
 
+  const { data: dataCategories, isLoading: IsLoadingCategories } = useQuery({
+    queryKey: ["categories", page, size],
+    queryFn: async (): Promise<ICategory[]> => {
+      const response = await api.get<IPageResponse<ICategory>>(`/categories`, {
+        params: {
+          page,
+          size,
+        },
+      });
+      return response.data.content;
+    },
+  });
+
   const { data: dataExpense, isLoading: dataExpenseIsLoading } = useQuery({
-    queryKey: ["expenses"],
+    queryKey: ["expenses", page, size],
     queryFn: async (): Promise<IExpense[]> => {
-      const response = await api.get(`/expenses`);
-      return response.data;
+      const response = await api.get<IPageResponse<IExpense>>(`/expenses`, {
+        params: {
+          page,
+          size,
+        },
+      });
+      return response.data.content;
     },
   });
 
@@ -125,7 +149,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col ">
-      {isLoading || dataExpenseIsLoading ? (
+      {IsLoadingCategories || isLoading || dataExpenseIsLoading ? (
         <>
           <Skeleton className="h-[10rem] w-full" />
           <Skeleton className="h-[20rem] w-full mt-[2rem]" />
@@ -201,11 +225,13 @@ const Dashboard = () => {
                   description: editExpenseValues?.description ?? "",
                   value: formatCurrency(
                     String(editExpenseValues?.value || 0),
-                    false
+                    false,
                   ),
+                  categoryId: editExpenseValues?.categoryId ?? 0,
                 }
               : undefined
           }
+          categories={dataCategories || []}
         />
       </Modal>
     </div>

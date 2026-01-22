@@ -7,7 +7,7 @@ interface ITableProps {
   onDelete: (id: number) => void;
 }
 
-const HEADE_NAMES = ["Nome", "Descrição", "Valor", "Ações"];
+const HEADE_NAMES = ["Nome", "Descrição", "Categoria", "Valor", "Ações"];
 
 const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
   return (
@@ -33,6 +33,7 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
               <tr key={item.id} className="hover:bg-gray-100">
                 <td className="px-4 py-2 whitespace-nowrap">{item.name}</td>
                 <td className="px-4 py-2">{item.description || "-"}</td>
+                <td className="px-4 py-2">{item.cateroryName || "-"}</td>
                 <td className="px-4 py-2">
                   {item.value.toLocaleString("pt-BR", {
                     style: "currency",
@@ -47,6 +48,7 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
                         name: item.name,
                         description: item.description,
                         value: item.value,
+                        categoryId: item.categoryId,
                       })
                     }
                     className="px-2 py-1  text-white rounded hover:bg-blue-100 transition cursor-pointer"
@@ -82,6 +84,12 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
                 {item.description || "-"}
               </p>
             ) : null}
+            {item.cateroryName ? (
+              <p>
+                <span className="font-semibold">Descrição:</span>{" "}
+                {item.cateroryName || "-"}
+              </p>
+            ) : null}
             <p>
               <span className="font-semibold">Valor:</span>{" "}
               {item.value.toLocaleString("pt-BR", {
@@ -97,6 +105,7 @@ const ExpenseTable = ({ data, onEdit, onDelete }: ITableProps) => {
                     name: item.name,
                     description: item.description,
                     value: item.value,
+                    categoryId: item.categoryId,
                   })
                 }
                 className="flex-1 px-2 py-1 flex justify-center items-center rounded hover:bg-blue-100 transition cursor-pointer"

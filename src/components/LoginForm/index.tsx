@@ -11,16 +11,18 @@ import CustomToast from "../CustomToast";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { decodeJwt } from "../../utils/decodeJwt";
 import SpinnerLoading from "../SpinnerLoading";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const { handleChangeToken } = useAuth();
   const { setValue: setToken } = useLocalStorage<string | null>(
     "@finance:token",
-    null
+    null,
   );
   const { setValue: setUserId } = useLocalStorage<string | null>(
     "@finance:userId",
-    null
+    null,
   );
   const {
     register,
@@ -51,6 +53,7 @@ export default function LoginForm() {
     if (loginSession.success) {
       const { data } = loginSession;
       setToken(data);
+      handleChangeToken(data);
       const decodeToken = decodeJwt(data || "");
       setUserId(JSON.stringify(decodeToken?.userId));
 
@@ -145,7 +148,7 @@ export default function LoginForm() {
         disabled={isLoading}
         className={clsx(
           isLoading && "!bg-teal-700 hover:cursor-default",
-          "hover:shadow-[0_0_15px_2px_#a1d1bd]"
+          "hover:shadow-[0_0_15px_2px_#a1d1bd]",
         )}
         type="submit"
       >

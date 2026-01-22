@@ -8,9 +8,7 @@ export const ExpenseSchema = z.object({
     .optional()
     .or(z.literal("")),
   value: z.string().min(1, "Valor é obrigatório"),
-  // categoryId: z.number({
-  //   requiredError: "Categoria é obrigatória",
-  // }),
+  categoryId: z.number().optional(),
 });
 
 export type ExpenseSchemaType = z.infer<typeof ExpenseSchema>;

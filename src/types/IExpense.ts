@@ -4,6 +4,7 @@ export interface IExpense {
   description?: string;
   value: number;
   categoryId?: number;
+  cateroryName?: string;
 }
 
 export interface ICreateOrEditExpense {
@@ -11,4 +12,5 @@ export interface ICreateOrEditExpense {
   name: string;
   description?: string;
   value: number;
+  categoryId?: number | null;
 }
