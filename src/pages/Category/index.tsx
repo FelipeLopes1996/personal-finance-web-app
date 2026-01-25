@@ -7,10 +7,17 @@ import Modal from "@/components/Modal";
 import NoDataContent from "@/components/NoDataContent";
 import { Skeleton } from "@/components/Skeleton";
 import type { ICategory } from "@/types/ICategory";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { IPageResponse } from "@/types/IPageResponse";
+import { PER_PAGE } from "@/utils/constants";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 interface ApiError {
   message: string;
   error: string;
@@ -26,13 +33,32 @@ const Category = () => {
 
   const [isOpenCreateOrEditModal, setIsOpenCreateOrEditModal] =
     useState<boolean>(false);
-  const { data: dataCategories, isLoading: IsLoadingCategories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async (): Promise<ICategory[]> => {
-      const response = await api.get(`/categories`);
+
+  const [page, setPage] = useState(0);
+  const size = PER_PAGE;
+
+  const {
+    data: dataCategories = undefined,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: ["categories", page, size],
+    queryFn: async () => {
+      const response = await api.get<IPageResponse<ICategory>>(`/categories`, {
+        params: {
+          page,
+          size,
+        },
+      });
       return response.data;
     },
+    placeholderData: keepPreviousData,
   });
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const createCategoryMutation = useMutation<
     void,
@@ -99,6 +125,14 @@ const Category = () => {
         title: "Categoria excluída com sucesso!",
         status: "success",
       });
+      setPage((prev) => {
+        if (!dataCategories) return prev;
+
+        const isLastItemOnPage =
+          dataCategories.content.length === 1 && prev > 0;
+
+        return isLastItemOnPage ? prev - 1 : prev;
+      });
       setCategoryId(0);
       setIsOpenDeleteModal(false);
     },
@@ -129,44 +163,43 @@ const Category = () => {
   return (
     <div className="flex flex-col ">
       <h1 className="text-[2rem] mb-[2rem]">Categorias</h1>
-      {IsLoadingCategories ? (
+      {isLoading ? (
         <>
-          <Skeleton className="h-[10rem] w-full" />
-          <Skeleton className="h-[20rem] w-full mt-[2rem]" />
+          <Skeleton className="h-[30rem] w-full mt-[2rem]" />
         </>
       ) : (
-        <>
-          {dataCategories?.length ? (
-            <div className="w-full mt-[2rem] bg-white rounded-[4px] overflow-hidden md:shadow-md">
-              <div className="flex items-center justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md ">
-                <h2 className="text-[1.2rem] md:text-[1.5rem]">
-                  Lista de categorias
-                </h2>
-                <div>
-                  <Button
-                    className="flex gap-1.5 items-center p-[0.8rem]"
-                    onClick={handleOrEditCreate}
-                  >
-                    {" "}
-                    <Plus size={20} />
-                    Adicionar
-                  </Button>
-                </div>
-              </div>
-              <CategoryTable
-                data={dataCategories || []}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
+        <div className="w-full  bg-white rounded-[4px] overflow-hidden md:shadow-md">
+          <div className="flex items-center justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md ">
+            <h2 className="text-[1.2rem] md:text-[1.5rem]">
+              Lista de categorias
+            </h2>
+            <div>
+              <Button
+                className="flex gap-1.5 items-center p-[0.8rem]"
+                onClick={handleOrEditCreate}
+              >
+                {" "}
+                <Plus size={20} />
+                Adicionar
+              </Button>
             </div>
-          ) : (
-            <NoDataContent
-              handleAction={handleOrEditCreate}
-              title="Você ainda não possui categoria"
-            />
-          )}
-        </>
+          </div>
+          <CategoryTable
+            data={dataCategories}
+            page={page}
+            loading={isFetching}
+            onPageChange={setPage}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </div>
       )}
+      {!dataCategories?.content?.length && !dataCategories && !isLoading ? (
+        <NoDataContent
+          handleAction={handleOrEditCreate}
+          title="Você ainda não possui categoria"
+        />
+      ) : null}
 
       <Modal
         isOpen={isOpenDeleteModal}

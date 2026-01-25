@@ -1,20 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { Button } from "../Button";
-import { clearStorage } from "../../utils/clearStorage";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
   useAuthGuard();
   const navigate = useNavigate();
-  const { value: token, setValue: setToken } = useLocalStorage<string | null>(
-    "@finance:token",
-    null
-  );
+  const { token, logout } = useAuth();
 
   const handleLogout = () => {
-    setToken("");
-    clearStorage();
+    logout();
     navigate("/");
   };
 
