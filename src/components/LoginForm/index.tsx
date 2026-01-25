@@ -69,7 +69,7 @@ export default function LoginForm() {
         description: "Seja Bem vindo!",
         status: "success",
       });
-      navigate("/dashboard");
+      navigate("/expense");
     } else {
       CustomToast({
         title: "Usuário ou senha inválidos",

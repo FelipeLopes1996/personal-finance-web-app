@@ -36,7 +36,7 @@ export function useAuthGuard() {
 
     // 🟢 LOGADO tentando acessar rota pública
     if (PUBLIC_ROUTES.includes(pathname)) {
-      navigate("/dashboard", { replace: true });
+      navigate("/expense", { replace: true });
     }
   }, [navigate, pathname]);
 }

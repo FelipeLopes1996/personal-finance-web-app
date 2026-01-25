@@ -104,7 +104,6 @@ export default function ExpenseForm({
         <p className="text-red-500 text-sm">{errors.value.message}</p>
       )}
 
-      {/* Categoria */}
       <SelectField
         {...register("categoryId", {
           valueAsNumber: true,
@@ -113,6 +112,9 @@ export default function ExpenseForm({
         optionSelectText="Selecione uma categoria"
         options={getCategoryNames}
       />
+      {errors.categoryId && (
+        <p className="text-red-500 text-sm">{errors.categoryId.message}</p>
+      )}
 
       <TextField
         type="date"

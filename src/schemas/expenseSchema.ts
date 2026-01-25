@@ -8,11 +8,10 @@ export const ExpenseSchema = z.object({
     .optional()
     .or(z.literal("")),
   value: z.string().min(1, "Valor é obrigatório"),
-  categoryId: z.number().optional(),
+  categoryId: z.number().min(1, "Categoria é obrigatório"),
   localDate: z
     .string()
     .refine((value) => !isNaN(Date.parse(value)), "Data inválida"),
-  // date: z.string().min(1, "Data obrigatória"),
 });
 
 export type ExpenseSchemaType = z.infer<typeof ExpenseSchema>;

@@ -25,7 +25,7 @@ import { useEffect, useState } from "react";
 const sizeExpense = PER_PAGE;
 const sizeCategory = 100;
 
-const Dashboard = () => {
+const Expense = () => {
   const { value: userId } = useLocalStorage<string | null>(
     "@finance:userId",
     null,
@@ -172,7 +172,7 @@ const Dashboard = () => {
         </>
       ) : (
         <>
-          <h1 className="text-[2rem] mb-[2rem]">Dashboard</h1>
+          <h1 className="text-[2rem] mb-[2rem]">Gasto</h1>
           <DashboardCard userName={data?.name} userSalary={data?.salary} />
 
           {!dataExpense?.content?.length ? null : (
@@ -260,4 +260,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Expense;
