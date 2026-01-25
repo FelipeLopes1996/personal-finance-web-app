@@ -172,7 +172,7 @@ const Expense = () => {
         </>
       ) : (
         <>
-          <h1 className="text-[2rem] mb-[2rem]">Gasto</h1>
+          <h1 className="text-[2rem] mb-[2rem]">Gastos</h1>
           <DashboardCard userName={data?.name} userSalary={data?.salary} />
 
           {!dataExpense?.content?.length ? null : (
