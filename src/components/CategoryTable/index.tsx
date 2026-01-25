@@ -105,9 +105,14 @@ const CategoryTable = ({
 
       {/* Mobile */}
       <div className="md:hidden space-y-4 mb-[2rem]">
-        {loading &&
+        {loading && (
+          <div className="flex justify-center">
+            <SpinnerLoading width="10" height="6" />
+          </div>
+        )}
+        {!loading &&
           data?.content?.length &&
-          data?.content.map((item) => (
+          data?.content?.map((item) => (
             <div
               key={item.id}
               className="border border-gray-200 rounded p-4 shadow-sm bg-white"

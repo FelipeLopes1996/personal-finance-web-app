@@ -4,12 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TextField } from "@/components/TextField";
 import { ExpenseSchema, type ExpenseSchemaType } from "@/schemas/expenseSchema";
 import { parseCurrencyToNumber } from "@/utils/parseCurrencyToNumber";
-import { formatCurrency } from "@/utils/formatCurrency";
 import { Button } from "../Button";
 import SpinnerLoading from "../SpinnerLoading";
 import type { ICreateOrEditExpense } from "@/types/IExpense";
 import { SelectField } from "../SelectField";
 import type { ICategory } from "@/types/ICategory";
+import { currencyMask } from "@/utils/formatCurrency";
+import { todayISO } from "@/utils/todayISO";
+import { useEffect } from "react";
 
 interface IExpenseForm {
   isLoading: boolean;
@@ -27,6 +29,8 @@ export default function ExpenseForm({
   const {
     register,
     handleSubmit,
+    setValue,
+    reset,
     formState: { errors },
   } = useForm<ExpenseSchemaType>({
     resolver: zodResolver(ExpenseSchema),
@@ -38,14 +42,15 @@ export default function ExpenseForm({
     description,
     value,
     categoryId,
+    localDate,
   }: ExpenseSchemaType) => {
     const bodyRequest = {
       name,
       description,
       value: parseCurrencyToNumber(value),
       categoryId: categoryId === 0 ? null : categoryId,
+      localDate,
     };
-    console.log(bodyRequest);
     if (errors.description || errors.name || errors.value) return;
     sendCreateOrEditExpense(bodyRequest);
   };
@@ -55,6 +60,14 @@ export default function ExpenseForm({
   const getCategoryNames = categories?.length
     ? categories.map(({ id, name }) => ({ value: id, label: name }))
     : [];
+
+  useEffect(() => {
+    if (!defaultValues?.name) {
+      reset({
+        localDate: todayISO(),
+      });
+    }
+  }, [defaultValues, reset]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -75,12 +88,18 @@ export default function ExpenseForm({
       <TextField
         {...register("value", {
           onChange: (e) => {
-            e.target.value = formatCurrency(e.target.value);
+            const maskedValue = currencyMask(e.target.value);
+
+            setValue("value", maskedValue, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
           },
         })}
         placeholder="Valor*"
         className="mt-[30px]"
       />
+
       {errors.value && (
         <p className="text-red-500 text-sm">{errors.value.message}</p>
       )}
@@ -93,6 +112,13 @@ export default function ExpenseForm({
         className="mt-[30px]"
         optionSelectText="Selecione uma categoria"
         options={getCategoryNames}
+      />
+
+      <TextField
+        type="date"
+        {...register("localDate")}
+        className="mt-[30px]"
+        max={todayISO()}
       />
 
       <Button disabled={isLoading} className="mt-[30px]" type="submit">

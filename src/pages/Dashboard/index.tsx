@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { api } from "@/api/axios";
 import { Button } from "@/components/Button";
 import CustomToast from "@/components/CustomToast";
@@ -14,9 +13,17 @@ import type { ICreateOrEditExpense, IExpense } from "@/types/IExpense";
 import type { IPageResponse } from "@/types/IPageResponse";
 import { PER_PAGE } from "@/utils/constants";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const sizeExpense = PER_PAGE;
+const sizeCategory = 100;
 
 const Dashboard = () => {
   const { value: userId } = useLocalStorage<string | null>(
@@ -30,10 +37,9 @@ const Dashboard = () => {
   const [editExpenseValues, setEditExpenseValues] = useState<IExpense | null>(
     null,
   );
-  const [page, setPage] = useState(0);
-  const size = PER_PAGE;
-
   const [expenseId, setExpenseId] = useState<number>(0);
+  const [page, setPage] = useState(0);
+
   const { data, isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
@@ -42,26 +48,36 @@ const Dashboard = () => {
     },
   });
 
+  const {
+    data: dataExpense = undefined,
+    isLoading: dataExpenseIsLoading,
+    isFetching: dataExpenseIsFetching,
+    refetch,
+  } = useQuery({
+    queryKey: ["expenses", page, sizeExpense],
+    queryFn: async () => {
+      const response = await api.get<IPageResponse<IExpense>>(`/expenses`, {
+        params: {
+          page,
+          size: sizeExpense,
+        },
+      });
+      return response.data;
+    },
+    placeholderData: keepPreviousData,
+  });
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
   const { data: dataCategories, isLoading: IsLoadingCategories } = useQuery({
-    queryKey: ["categories", page, size],
+    queryKey: ["categories", page, sizeCategory],
     queryFn: async (): Promise<ICategory[]> => {
       const response = await api.get<IPageResponse<ICategory>>(`/categories`, {
         params: {
           page,
-          size,
-        },
-      });
-      return response.data.content;
-    },
-  });
-
-  const { data: dataExpense, isLoading: dataExpenseIsLoading } = useQuery({
-    queryKey: ["expenses", page, size],
-    queryFn: async (): Promise<IExpense[]> => {
-      const response = await api.get<IPageResponse<IExpense>>(`/expenses`, {
-        params: {
-          page,
-          size,
+          size: sizeCategory,
         },
       });
       return response.data.content;
@@ -158,7 +174,8 @@ const Dashboard = () => {
         <>
           <h1 className="text-[2rem] mb-[2rem]">Dashboard</h1>
           <DashboardCard userName={data?.name} userSalary={data?.salary} />
-          {dataExpense?.length ? (
+
+          {!dataExpense?.content?.length ? null : (
             <div className="w-full mt-[2rem] bg-white rounded-[4px] overflow-hidden md:shadow-md">
               <div className="flex items-center justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md ">
                 <h2 className="text-[1.2rem] md:text-[1.5rem]">
@@ -176,19 +193,26 @@ const Dashboard = () => {
                 </div>
               </div>
               <ExpenseTable
-                data={dataExpense || []}
+                data={dataExpense}
+                page={page}
+                loading={dataExpenseIsFetching}
+                onPageChange={setPage}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
               />
             </div>
-          ) : (
-            <NoDataContent
-              handleAction={handleOrEditCreate}
-              title="Você ainda não possui gastos"
-            />
           )}
         </>
       )}
+      <>
+        {!dataExpense?.content?.length && !isLoading ? (
+          <NoDataContent
+            handleAction={handleOrEditCreate}
+            title="Você ainda não possui gastos"
+          />
+        ) : null}
+      </>
+
       <Modal
         isOpen={isOpenDeleteModal}
         onClose={() => setIsOpenDeleteModal(false)}
@@ -223,11 +247,9 @@ const Dashboard = () => {
               ? {
                   name: editExpenseValues?.name,
                   description: editExpenseValues?.description ?? "",
-                  value: formatCurrency(
-                    String(editExpenseValues?.value || 0),
-                    false,
-                  ),
+                  value: formatCurrency(String(editExpenseValues?.value || 0)),
                   categoryId: editExpenseValues?.categoryId ?? 0,
+                  localDate: editExpenseValues?.date,
                 }
               : undefined
           }
