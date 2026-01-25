@@ -3,10 +3,12 @@ import { useEffect } from "react";
 import { decodeJwt } from "../utils/decodeJwt";
 import { isTokenExpired } from "../utils/isTokenExpired";
 import { clearStorage } from "../utils/clearStorage";
+import { useAuth } from "./useAuth";
 
 const PUBLIC_ROUTES = ["/", "/login", "/register"];
 
 export function useAuthGuard() {
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -27,13 +29,14 @@ export function useAuthGuard() {
     // 🔴 TOKEN EXPIRADO
     if (isTokenExpired(token?.exp || 0)) {
       clearStorage();
+      logout();
       navigate("/", { replace: true });
       return;
     }
 
     // 🟢 LOGADO tentando acessar rota pública
     if (PUBLIC_ROUTES.includes(pathname)) {
-      navigate("/dashboard", { replace: true });
+      navigate("/expense", { replace: true });
     }
   }, [navigate, pathname]);
 }

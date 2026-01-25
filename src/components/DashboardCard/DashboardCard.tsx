@@ -30,7 +30,7 @@ CardType) {
         <div>
           <p className="text-sm text-gray-500">Salário mensal</p>
           <p className="text-lg font-bold text-green-600">
-            {formatCurrency(String(userSalary || 0), false)}
+            {formatCurrency(String(userSalary || 0))}
           </p>
         </div>
 

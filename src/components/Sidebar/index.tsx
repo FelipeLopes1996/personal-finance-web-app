@@ -1,4 +1,4 @@
-import { Home, TableOfContents } from "lucide-react";
+import { ShoppingCart, TableOfContents } from "lucide-react";
 import clsx from "clsx";
 import { NavItem } from "../NavItem";
 
@@ -15,13 +15,13 @@ export default function Sidebar({ variant }: SidebarProps) {
         "bg-teal-50  ",
         isFooter
           ? "flex justify-around items-center h-14"
-          : "w-64 min-h-full flex flex-col border-r-1 border-[#e5e5e5] "
+          : "w-64 min-h-full flex flex-col border-r-1 border-[#e5e5e5] ",
       )}
     >
       <NavItem
-        to="/dashboard"
-        icon={<Home />}
-        label="Dashboard"
+        to="/expense"
+        icon={<ShoppingCart />}
+        label="Gastos"
         isFooter={isFooter}
       />
       <NavItem
@@ -30,6 +30,12 @@ export default function Sidebar({ variant }: SidebarProps) {
         label="Categorias"
         isFooter={isFooter}
       />
+      {/* <NavItem
+          to="/dashboard"
+          icon={<Home />}
+          label="Dashboard"
+          isFooter={isFooter}
+        /> */}
       {/* <NavItem
         to="/profile"
         icon={<User />}

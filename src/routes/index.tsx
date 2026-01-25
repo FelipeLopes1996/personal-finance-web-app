@@ -3,7 +3,7 @@ import MainLayout from "../pages/layouts/MainLayout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-import Dashboard from "../pages/Dashboard";
+import Expense from "../pages/Expense";
 import { PrivateRoutesLayout } from "./PrivateRoutesLayout";
 import DashboardLayout from "../pages/layouts/DashboardLayout";
 import Profile from "@/pages/Profile";
@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
       {
         element: <DashboardLayout />, // layout do dashboard
         children: [
-          { path: "dashboard", element: <Dashboard /> },
+          { path: "expense", element: <Expense /> },
           { path: "profile", element: <Profile /> },
           { path: "category", element: <Category /> },
           // { path: "settings", element: <Settings /> }, // /dashboard/settings
