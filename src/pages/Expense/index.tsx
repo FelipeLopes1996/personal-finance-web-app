@@ -2,6 +2,7 @@ import { api } from "@/api/axios";
 import { Button } from "@/components/Button";
 import CustomToast from "@/components/CustomToast";
 import { DashboardCard } from "@/components/DashboardCard/DashboardCard";
+import ExpenseFiltersForm from "@/components/ExpenseFiltersForm";
 import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseTable from "@/components/ExpenseTable";
 import Modal from "@/components/Modal";
@@ -10,6 +11,7 @@ import { Skeleton } from "@/components/Skeleton";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import type { ICategory } from "@/types/ICategory";
 import type { ICreateOrEditExpense, IExpense } from "@/types/IExpense";
+import type { IExpenseFilters } from "@/types/IExpenseFilters";
 import type { IPageResponse } from "@/types/IPageResponse";
 import { PER_PAGE } from "@/utils/constants";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -19,8 +21,8 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ListFilter, Plus } from "lucide-react";
+import { useState } from "react";
 
 const sizeExpense = PER_PAGE;
 const sizeCategory = 100;
@@ -32,6 +34,7 @@ const Expense = () => {
   );
   const queryClient = useQueryClient();
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
+  const [isOpenFiltersModal, setIsOpenFiltersModal] = useState<boolean>(false);
   const [isOpenCreateOrEditModal, setIsOpenCreateOrEditModal] =
     useState<boolean>(false);
   const [editExpenseValues, setEditExpenseValues] = useState<IExpense | null>(
@@ -39,6 +42,7 @@ const Expense = () => {
   );
   const [expenseId, setExpenseId] = useState<number>(0);
   const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<IExpenseFilters>({});
 
   const { data, isLoading } = useQuery({
     queryKey: ["users"],
@@ -52,14 +56,17 @@ const Expense = () => {
     data: dataExpense = undefined,
     isLoading: dataExpenseIsLoading,
     isFetching: dataExpenseIsFetching,
-    refetch,
   } = useQuery({
-    queryKey: ["expenses", page, sizeExpense],
+    queryKey: ["expenses", page, sizeExpense, filters],
     queryFn: async () => {
       const response = await api.get<IPageResponse<IExpense>>(`/expenses`, {
         params: {
           page,
           size: sizeExpense,
+          text: filters.text,
+          minValue: filters.minValue,
+          maxValue: filters.maxValue,
+          categoryId: filters.categoryId,
         },
       });
       return response.data;
@@ -67,22 +74,23 @@ const Expense = () => {
     placeholderData: keepPreviousData,
   });
 
-  useEffect(() => {
-    refetch();
-  }, []);
-
-  const { data: dataCategories, isLoading: IsLoadingCategories } = useQuery({
-    queryKey: ["categories", page, sizeCategory],
-    queryFn: async (): Promise<ICategory[]> => {
-      const response = await api.get<IPageResponse<ICategory>>(`/categories`, {
-        params: {
-          page,
-          size: sizeCategory,
-        },
-      });
-      return response.data.content;
-    },
-  });
+  const { data: dataSystemCategories, isLoading: IsLoadingSystemCategories } =
+    useQuery({
+      queryKey: ["categories-available", sizeCategory],
+      queryFn: async (): Promise<ICategory[]> => {
+        const response = await api.get<IPageResponse<ICategory>>(
+          `/categories/available`,
+          {
+            params: {
+              page: 0,
+              size: sizeCategory,
+            },
+          },
+        );
+        return response.data.content;
+      },
+      placeholderData: keepPreviousData,
+    });
 
   const deleteExpenseMutation = useMutation({
     mutationFn: async (): Promise<void> => {
@@ -109,7 +117,6 @@ const Expense = () => {
       await api.post(`/expenses`, payload);
     },
     onSuccess: () => {
-      // Atualiza a lista após deletar
       queryClient.invalidateQueries({
         queryKey: ["expenses"],
       });
@@ -163,9 +170,31 @@ const Expense = () => {
     setIsOpenCreateOrEditModal(false);
   };
 
+  const handleSetFilters = (filters: IExpenseFilters) => {
+    setFilters(filters);
+    setIsOpenFiltersModal(false);
+  };
+
+  const hasFilters = Boolean(
+    filters.text || filters.minValue || filters.maxValue || filters.categoryId,
+  );
+
+  const filterDefaultValues = filters
+    ? {
+        text: filters.text,
+        minValue: filters.minValue
+          ? formatCurrency(String(filters.minValue))
+          : undefined,
+        maxValue: filters.maxValue
+          ? formatCurrency(String(filters.maxValue))
+          : undefined,
+        categoryId: filters.categoryId ?? undefined,
+      }
+    : undefined;
+
   return (
     <div className="flex flex-col ">
-      {IsLoadingCategories || isLoading || dataExpenseIsLoading ? (
+      {isLoading || dataExpenseIsLoading || IsLoadingSystemCategories ? (
         <>
           <Skeleton className="h-[10rem] w-full" />
           <Skeleton className="h-[20rem] w-full mt-[2rem]" />
@@ -175,18 +204,29 @@ const Expense = () => {
           <h1 className="text-[2rem] mb-[2rem]">Gastos</h1>
           <DashboardCard userName={data?.name} userSalary={data?.salary} />
 
-          {!dataExpense?.content?.length ? null : (
+          {!dataExpense?.content?.length && !hasFilters ? null : (
             <div className="w-full mt-[2rem] bg-white rounded-[4px] overflow-hidden md:shadow-md">
-              <div className="flex items-center justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md ">
-                <h2 className="text-[1.2rem] md:text-[1.5rem]">
-                  Lista de gastos
-                </h2>
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md">
+                <div className="flex items-center gap-[1.5rem]">
+                  <h2 className="text-[1.2rem] md:text-[1.5rem] ">
+                    Lista de gastos
+                  </h2>
+                  <div>
+                    <Button
+                      className="flex gap-1.5 items-center p-[0.8rem]"
+                      onClick={() => setIsOpenFiltersModal(true)}
+                      textButton="text"
+                    >
+                      <ListFilter size={20} />
+                      Filtros
+                    </Button>
+                  </div>
+                </div>
                 <div>
                   <Button
-                    className="flex gap-1.5 items-center p-[0.8rem]"
+                    className="flex items-center justify-center gap-1.5 items-center p-[0.8rem]"
                     onClick={handleOrEditCreate}
                   >
-                    {" "}
                     <Plus size={20} />
                     Adicionar
                   </Button>
@@ -205,18 +245,32 @@ const Expense = () => {
         </>
       )}
       <>
-        {!dataExpense?.content?.length && !isLoading ? (
+        {!dataExpense?.content?.length && !isLoading && !hasFilters ? (
           <NoDataContent
             handleAction={handleOrEditCreate}
             title="Você ainda não possui gastos"
           />
         ) : null}
       </>
+      <Modal
+        isOpen={isOpenFiltersModal}
+        onClose={() => setIsOpenFiltersModal(false)}
+        title="Filtros"
+        isForm={true}
+        onConfirm={() => {}}
+        isLoading={deleteExpenseMutation.isPending}
+      >
+        <ExpenseFiltersForm
+          categories={dataSystemCategories || []}
+          handleSetFilters={handleSetFilters}
+          defaultValues={filterDefaultValues}
+        />
+      </Modal>
 
       <Modal
         isOpen={isOpenDeleteModal}
         onClose={() => setIsOpenDeleteModal(false)}
-        title="Excluir gasto"
+        title="Excluir Gasto"
         confirmText="Excluir"
         onConfirm={() => deleteExpenseMutation.mutate()}
         isLoading={deleteExpenseMutation.isPending}
@@ -253,7 +307,7 @@ const Expense = () => {
                 }
               : undefined
           }
-          categories={dataCategories || []}
+          categories={dataSystemCategories || []}
         />
       </Modal>
     </div>

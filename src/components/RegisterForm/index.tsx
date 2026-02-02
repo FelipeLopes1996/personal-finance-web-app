@@ -8,7 +8,7 @@ import { RegisterSchema } from "../../schemas/RegisterSchema";
 import { apiRequest } from "../../utils/api-request";
 import { useNavigate } from "react-router-dom";
 import CustomToast from "../CustomToast";
-import { formatCurrency } from "../../utils/formatCurrency";
+import { currencyMask } from "../../utils/formatCurrency";
 import { parseCurrencyToNumber } from "../../utils/parseCurrencyToNumber";
 import SpinnerLoading from "../SpinnerLoading";
 
@@ -24,7 +24,7 @@ export default function RegisterForm() {
   const {
     register,
     handleSubmit,
-    // reset,
+    setValue,
     formState: { errors },
   } = useForm<RegisterSchema>({
     resolver: zodResolver(RegisterSchema),
@@ -93,7 +93,12 @@ export default function RegisterForm() {
       <TextField
         {...register("salary", {
           onChange: (e) => {
-            e.target.value = formatCurrency(e.target.value);
+            const maskedValue = currencyMask(e.target.value);
+
+            setValue("salary", maskedValue, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
           },
         })}
         placeholder="Salário"
@@ -134,7 +139,7 @@ export default function RegisterForm() {
         disabled={isLoading}
         className={clsx(
           isLoading && "!bg-teal-700 hover:cursor-default",
-          "hover:shadow-[0_0_15px_2px_#a1d1bd]"
+          "hover:shadow-[0_0_15px_2px_#a1d1bd]",
         )}
         type="submit"
       >
