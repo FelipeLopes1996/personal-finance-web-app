@@ -168,33 +168,37 @@ const Category = () => {
           <Skeleton className="h-[30rem] w-full mt-[2rem]" />
         </>
       ) : (
-        <div className="w-full  bg-white rounded-[4px] overflow-hidden md:shadow-md">
-          <div className="flex items-center justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md ">
-            <h2 className="text-[1.2rem] md:text-[1.5rem]">
-              Lista de categorias
-            </h2>
-            <div>
-              <Button
-                className="flex gap-1.5 items-center p-[0.8rem]"
-                onClick={handleOrEditCreate}
-              >
-                {" "}
-                <Plus size={20} />
-                Adicionar
-              </Button>
+        <>
+          {!dataCategories?.content?.length ? null : (
+            <div className="w-full  bg-white rounded-[4px] overflow-hidden md:shadow-md">
+              <div className="flex items-center justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md ">
+                <h2 className="text-[1.2rem] md:text-[1.5rem]">
+                  Lista de categorias
+                </h2>
+                <div>
+                  <Button
+                    className="flex gap-1.5 items-center p-[0.8rem]"
+                    onClick={handleOrEditCreate}
+                  >
+                    {" "}
+                    <Plus size={20} />
+                    Adicionar
+                  </Button>
+                </div>
+              </div>
+              <CategoryTable
+                data={dataCategories}
+                page={page}
+                loading={isFetching}
+                onPageChange={setPage}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             </div>
-          </div>
-          <CategoryTable
-            data={dataCategories}
-            page={page}
-            loading={isFetching}
-            onPageChange={setPage}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        </div>
+          )}
+        </>
       )}
-      {!dataCategories?.content?.length && !dataCategories && !isLoading ? (
+      {!dataCategories?.content?.length && !isLoading ? (
         <NoDataContent
           handleAction={handleOrEditCreate}
           title="Você ainda não possui categoria"

@@ -50,51 +50,58 @@ const ExpenseTable = ({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {!loading &&
-              data?.content?.length &&
-              data?.content.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-100">
-                  <td className="px-4 py-2 whitespace-nowrap">{item.name}</td>
-                  <td className="px-4 py-2">{item.description || "-"}</td>
-                  <td className="px-4 py-2">{item.cateroryName || "-"}</td>
-                  <td className="px-4 py-2">
-                    {item.value.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </td>
-                  <td className="px-4 py-2">
-                    {item.date ? formatters.formatDateBR(item.date) : "-"}
-                  </td>
-                  <td className="px-4 py-2 flex gap-2">
-                    <button
-                      onClick={() =>
-                        onEdit({
-                          id: item.id,
-                          name: item.name,
-                          description: item.description,
-                          value: item.value,
-                          categoryId: item.categoryId,
-                          date: item.date,
-                        })
-                      }
-                      className="px-2 py-1  text-white rounded hover:bg-blue-100 transition cursor-pointer"
-                    >
-                      <Pencil size={20} className="text-blue-500" />
-                    </button>
-                    <button
-                      onClick={() => onDelete(item.id)}
-                      className="px-2 py-1  text-white rounded hover:bg-red-100 transition cursor-pointer"
-                    >
-                      <Trash size={20} className="text-red-500" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            {!loading && data?.content?.length
+              ? data?.content.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-100">
+                    <td className="px-4 py-2 whitespace-nowrap">{item.name}</td>
+                    <td className="px-4 py-2">{item.description || "-"}</td>
+                    <td className="px-4 py-2">{item.cateroryName || "-"}</td>
+                    <td className="px-4 py-2">
+                      {item.value.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </td>
+                    <td className="px-4 py-2">
+                      {item.date ? formatters.formatDateBR(item.date) : "-"}
+                    </td>
+                    <td className="px-4 py-2 flex gap-2">
+                      <button
+                        onClick={() =>
+                          onEdit({
+                            id: item.id,
+                            name: item.name,
+                            description: item.description,
+                            value: item.value,
+                            categoryId: item.categoryId,
+                            date: item.date,
+                          })
+                        }
+                        className="px-2 py-1  text-white rounded hover:bg-blue-100 transition cursor-pointer"
+                      >
+                        <Pencil size={20} className="text-blue-500" />
+                      </button>
+                      <button
+                        onClick={() => onDelete(item.id)}
+                        className="px-2 py-1  text-white rounded hover:bg-red-100 transition cursor-pointer"
+                      >
+                        <Trash size={20} className="text-red-500" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              : null}
             {loading && (
               <tr>
                 <td colSpan={6} className="px-4 py-4 text-center">
                   <SpinnerLoading width="10" height="6" />
+                </td>
+              </tr>
+            )}
+            {!loading && !data?.content?.length && (
+              <tr>
+                <td colSpan={6} className="px-4 py-4 text-center">
+                  Nehum resultado encontrado
                 </td>
               </tr>
             )}
