@@ -14,7 +14,7 @@ export default function DashboardLayout() {
           <aside className="hidden md:flex">
             <Sidebar variant="sidebar" />
           </aside>
-          <main className="flex-1 p-7.5 pb-[1rem] overflow-y-auto">
+          <main className="flex-1 p-7.5 pb-[4rem] overflow-y-auto">
             <Outlet />
           </main>
         </div>

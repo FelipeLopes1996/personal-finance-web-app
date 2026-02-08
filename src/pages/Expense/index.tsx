@@ -8,6 +8,7 @@ import ExpenseTable from "@/components/ExpenseTable";
 import Modal from "@/components/Modal";
 import NoDataContent from "@/components/NoDataContent";
 import { Skeleton } from "@/components/Skeleton";
+import { TextField } from "@/components/TextField";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import type { ICategory } from "@/types/ICategory";
 import type { ICreateOrEditExpense, IExpense } from "@/types/IExpense";
@@ -22,7 +23,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { ListFilter, Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const sizeExpense = PER_PAGE;
 const sizeCategory = 100;
@@ -43,6 +44,18 @@ const Expense = () => {
   const [expenseId, setExpenseId] = useState<number>(0);
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<IExpenseFilters>({});
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setFilters((prev) => ({
+        ...prev,
+        text: search,
+      }));
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [search]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["users"],
@@ -51,6 +64,8 @@ const Expense = () => {
       return response.data;
     },
   });
+
+  console.log("filters", filters);
 
   const {
     data: dataExpense = undefined,
@@ -181,7 +196,6 @@ const Expense = () => {
 
   const filterDefaultValues = filters
     ? {
-        text: filters.text,
         minValue: filters.minValue
           ? formatCurrency(String(filters.minValue))
           : undefined,
@@ -206,19 +220,24 @@ const Expense = () => {
 
           {!dataExpense?.content?.length && !hasFilters ? null : (
             <div className="w-full mt-[2rem] bg-white rounded-[4px] overflow-hidden md:shadow-md">
+              <h2 className="text-[1.2rem] md:text-[1.5rem]  pb-6 md:pt-6 md:pl-6">
+                Lista de gastos
+              </h2>
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md">
-                <div className="flex items-center gap-[1.5rem]">
-                  <h2 className="text-[1.2rem] md:text-[1.5rem] ">
-                    Lista de gastos
-                  </h2>
+                <div className="flex items-center gap-[1rem]">
+                  <TextField
+                    placeholder="Buscar por nome ou descrição"
+                    onChange={({ target }) => setSearch(target.value)}
+                    className="ml-[0.1rem] w-[15.05rem] p-[0.7rem]"
+                  />
                   <div>
                     <Button
-                      className="flex gap-1.5 items-center p-[0.8rem]"
+                      className="flex gap-1.5 items-center p-[0.85rem] "
                       onClick={() => setIsOpenFiltersModal(true)}
                       textButton="text"
                     >
                       <ListFilter size={20} />
-                      Filtros
+                      <span className="hidden md:inline">Filtros</span>
                     </Button>
                   </div>
                 </div>

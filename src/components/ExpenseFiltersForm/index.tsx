@@ -32,13 +32,11 @@ const ExpenseFiltersForm = ({
     });
 
   const onSubmit = ({
-    text,
     minValue,
     maxValue,
     categoryId,
   }: ExpenseFilterSchemaType) => {
     const filters: IExpenseFilters = {
-      text: text || undefined,
       minValue: minValue ? parseCurrencyToNumber(minValue) : undefined,
       maxValue: maxValue ? parseCurrencyToNumber(maxValue) : undefined,
       categoryId: categoryId === 0 ? undefined : categoryId,
@@ -54,8 +52,6 @@ const ExpenseFiltersForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <TextField {...register("text")} placeholder="Buscar por texto" />
-
       <TextField
         {...register("minValue", {
           onChange: (e) => {

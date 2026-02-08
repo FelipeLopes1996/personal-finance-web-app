@@ -6,16 +6,15 @@ interface IButton extends React.ComponentProps<"button"> {
 }
 
 export function Button({ textButton = "outline", ...props }: IButton) {
-  const baseStyle =
-    "w-full p-3.5 cursor-pointer transition-colors rounded-[6px]";
+  const baseStyle = "w-full  cursor-pointer transition-colors rounded-[6px]";
 
   const variants = {
-    text: "bg-white text-teal-600 hover:bg-teal-50",
-    outline: "text-white bg-teal-600",
+    text: "bg-white text-teal-600 hover:bg-teal-50 p-3.5",
+    outline: "text-white bg-teal-600 p-3.5",
   };
 
   const buttonClasses = clsx(
-    `${baseStyle} ${variants[textButton]} ${props.className ?? ""}`
+    `${baseStyle} ${variants[textButton]} ${props.className ?? ""}`,
   );
 
   return <button {...props} className={buttonClasses} />;

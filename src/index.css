@@ -9,5 +9,24 @@ body,
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden; /* trava scroll global */
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 10px;
+}
+
+/* fundo da barra */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0d9488;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3730a3;
 }

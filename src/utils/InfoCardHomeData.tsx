@@ -44,9 +44,9 @@ export const infoCardHomeData: InfoCardProps[] = [
         />
       </svg>
     ),
-    title: "",
-    infoText: "",
-    isInComing: true,
+    title: "Integração com faturas",
+    infoText: "Seus gastos no cartão poderão ser vínculados",
+    isInComing: false,
   },
   {
     icon: (
@@ -69,8 +69,8 @@ export const infoCardHomeData: InfoCardProps[] = [
         />
       </svg>
     ),
-    title: "",
-    infoText: "",
-    isInComing: true,
+    title: "Gráficos e relatório dos seus gastos",
+    infoText: "Comparar e avaliar gráficos e baixar relatórios de seus gastos",
+    isInComing: false,
   },
 ];
