@@ -1,8 +1,8 @@
 import type { ICategory } from "@/types/ICategory";
 import type { IPageResponse } from "@/types/IPageResponse";
-import { ArrowLeft, ArrowRight, Pencil, Trash } from "lucide-react";
-import { Button } from "../Button";
+import { Pencil, Trash } from "lucide-react";
 import SpinnerLoading from "../SpinnerLoading";
+import { PaginationTable } from "../PaginationTable";
 
 interface ITableProps {
   // data: ICategory[];
@@ -79,28 +79,12 @@ const CategoryTable = ({
             )}
           </tbody>
         </table>
-        {/* Paginação Desktop */}
-        <div className="flex justify-end items-center gap-4 p-4 px-[1rem]">
-          <Button
-            disabled={data?.first || loading}
-            onClick={() => onPageChange(page - 1)}
-            className="border disabled:opacity-50 !w-auto"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-
-          <span>
-            Página {Number(data?.number) + 1} de {data?.totalPages}
-          </span>
-
-          <Button
-            disabled={data?.last || loading}
-            onClick={() => onPageChange(page + 1)}
-            className="border rounded disabled:opacity-50 !w-auto"
-          >
-            <ArrowRight className="w-5 h-5" />
-          </Button>
-        </div>
+        <PaginationTable
+          data={data}
+          page={page}
+          loading={loading}
+          onPageChange={(newPage) => onPageChange(newPage)}
+        />
       </div>
 
       {/* Mobile */}
@@ -142,27 +126,12 @@ const CategoryTable = ({
               </div>
             </div>
           ))}
-        <div className="flex justify-between items-center mt-4">
-          <Button
-            disabled={data?.first || loading}
-            onClick={() => onPageChange(page - 1)}
-            className="!w-auto disabled:opacity-50"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-
-          <span className="text-sm">
-            {Number(data?.number) + 1} / {data?.totalPages}
-          </span>
-
-          <Button
-            disabled={data?.last || loading}
-            onClick={() => onPageChange(page + 1)}
-            className="!w-auto disabled:opacity-50"
-          >
-            <ArrowRight className="w-5 h-5" />
-          </Button>
-        </div>
+        <PaginationTable
+          data={data}
+          page={page}
+          loading={loading}
+          onPageChange={(newPage) => onPageChange(newPage)}
+        />
       </div>
     </>
   );
