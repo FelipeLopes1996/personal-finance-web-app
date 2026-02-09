@@ -70,20 +70,23 @@ export default function ExpenseForm({
   }, [defaultValues, reset]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <TextField {...register("name")} placeholder="Nome*" />
-      {errors.name && (
-        <p className="text-red-500 text-sm">{errors.name.message}</p>
-      )}
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-[1.3rem]"
+    >
+      <TextField
+        {...register("name")}
+        placeholder="Nome*"
+        error={!!errors.name}
+        errorMsg={errors?.name?.message || ""}
+      />
 
       <TextField
         {...register("description")}
         placeholder="Descrição*"
-        className="mt-[30px]"
+        error={!!errors.description}
+        errorMsg={errors?.description?.message || ""}
       />
-      {errors.description && (
-        <p className="text-red-500 text-sm">{errors.description.message}</p>
-      )}
 
       <TextField
         {...register("value", {
@@ -97,33 +100,23 @@ export default function ExpenseForm({
           },
         })}
         placeholder="Valor*"
-        className="mt-[30px]"
+        error={!!errors.value}
+        errorMsg={errors?.value?.message || ""}
       />
-
-      {errors.value && (
-        <p className="text-red-500 text-sm">{errors.value.message}</p>
-      )}
 
       <SelectField
         {...register("categoryId", {
           valueAsNumber: true,
         })}
-        className="mt-[30px]"
         optionSelectText="Selecione uma categoria"
         options={getCategoryNames}
-      />
-      {errors.categoryId && (
-        <p className="text-red-500 text-sm">{errors.categoryId.message}</p>
-      )}
-
-      <TextField
-        type="date"
-        {...register("localDate")}
-        className="mt-[30px]"
-        max={todayISO()}
+        error={!!errors.categoryId}
+        errorMsg={errors?.categoryId?.message || ""}
       />
 
-      <Button disabled={isLoading} className="mt-[30px]" type="submit">
+      <TextField type="date" {...register("localDate")} max={todayISO()} />
+
+      <Button disabled={isLoading} type="submit">
         {isLoading ? <SpinnerLoading width="5" height="5" /> : btnText}
       </Button>
     </form>
