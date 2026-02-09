@@ -11,6 +11,7 @@ import CustomToast from "../CustomToast";
 import { currencyMask } from "../../utils/formatCurrency";
 import { parseCurrencyToNumber } from "../../utils/parseCurrencyToNumber";
 import SpinnerLoading from "../SpinnerLoading";
+import { Eye, EyeClosed } from "lucide-react";
 
 interface IRegisterUser {
   name: string;
@@ -30,6 +31,8 @@ export default function RegisterForm() {
     resolver: zodResolver(RegisterSchema),
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   const onSubmit = async ({
     name,
@@ -75,21 +78,25 @@ export default function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <TextField {...register("name")} placeholder="Nome*" type="text" />
-      {errors.name && (
-        <p className="text-red-500 text-sm">{errors.name.message}</p>
-      )}
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-[1.5rem]"
+    >
+      <TextField
+        {...register("name")}
+        placeholder="Nome*"
+        type="text"
+        error={!!errors.name}
+        errorMsg={errors?.name?.message || ""}
+      />
 
       <TextField
         {...register("email")}
         placeholder="e-mail*"
         type="email"
-        className="mt-[30px]"
+        error={!!errors.email}
+        errorMsg={errors?.email?.message || ""}
       />
-      {errors.email && (
-        <p className="text-red-500 text-sm ">{errors.email.message}</p>
-      )}
       <TextField
         {...register("salary", {
           onChange: (e) => {
@@ -103,37 +110,41 @@ export default function RegisterForm() {
         })}
         placeholder="Salário"
         type="text"
-        className="mt-[30px]"
+        error={!!errors.salary}
+        errorMsg={errors?.salary?.message || ""}
       />
-      {errors.email && (
-        <p className="text-red-500 text-sm ">{errors.salary?.message}</p>
-      )}
 
-      <div className="flex flex-col relative mb-[30px]">
-        <TextField
-          {...register("password")}
-          placeholder="Senha*"
-          type="password"
-          className="mt-[30px]"
-        />
-        {errors.password && (
-          <p className="text-red-500 text-sm pl-[10px]">
-            {errors.password.message}
-          </p>
-        )}
+      <TextField
+        {...register("password")}
+        placeholder="Senha*"
+        type={showPassword ? "text" : "password"}
+        error={!!errors.password}
+        errorMsg={errors?.password?.message || ""}
+        onIconClick={() => setShowPassword(!showPassword)}
+        icon={
+          showPassword ? (
+            <EyeClosed className="hover: cursor-pointer" />
+          ) : (
+            <Eye className="hover: cursor-pointer" />
+          )
+        }
+      />
 
-        <TextField
-          {...register("confirmPassword")}
-          placeholder="Confirmar Senha*"
-          type="password"
-          className="mt-[30px]"
-        />
-        {errors.confirmPassword && (
-          <p className="text-red-500 text-sm pl-[10px]">
-            {errors.confirmPassword.message}
-          </p>
-        )}
-      </div>
+      <TextField
+        {...register("confirmPassword")}
+        placeholder="Confirmar Senha*"
+        type={showPasswordConfirm ? "text" : "password"}
+        icon={
+          showPasswordConfirm ? (
+            <EyeClosed className="hover: cursor-pointer" />
+          ) : (
+            <Eye className="hover: cursor-pointer" />
+          )
+        }
+        error={!!errors.confirmPassword}
+        errorMsg={errors?.confirmPassword?.message || ""}
+        onIconClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+      />
 
       <Button
         disabled={isLoading}

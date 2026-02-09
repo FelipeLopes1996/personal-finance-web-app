@@ -12,6 +12,7 @@ import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { decodeJwt } from "../../utils/decodeJwt";
 import SpinnerLoading from "../SpinnerLoading";
 import { useAuth } from "@/hooks/useAuth";
+import { Eye, EyeClosed } from "lucide-react";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -82,67 +83,35 @@ export default function LoginForm() {
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col mb-[30px]">
-        <TextField
-          {...register("email")}
-          placeholder="e-mail*"
-          type="text"
-          required
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm pl-[15px]">
-            {errors.email.message}
-          </p>
-        )}
-        {!errors.email && (
-          <span className="text-[#C5C5C5] text-[12px] pl-[15px]">
-            Insira o seu e-mail
-          </span>
-        )}
-      </div>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-[1.5rem]"
+    >
+      <TextField
+        {...register("email")}
+        placeholder="e-mail*"
+        type="text"
+        required
+        error={!!errors.email}
+        errorMsg={errors?.email?.message || "Insira o seu e-mail"}
+      />
 
-      <div className="flex flex-col relative mb-[30px]">
-        <TextField
-          {...register("password")}
-          placeholder="Senha*"
-          type={showPassword ? "text" : "password"}
-          required
-        />
-        {errors.password && (
-          <p className="text-red-500 text-sm pl-[15px]">
-            {errors.password.message}
-          </p>
-        )}
-
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-3 text-gray-400 hover:cursor-pointer"
-        >
-          {/* <VisibleIcon /> */}
-        </button>
-      </div>
-
-      {/* <div className="flex items-center justify-between text-gray-400 text-sm mb-[40px]">
-        <label className="flex items-center gap-2 cursor-pointer text-[#C5C5C5]">
-          <span className="relative w-5 h-5">
-            <input
-              onChange={() => setIsRememberUser(!isRememberUser)}
-              checked={isRememberUser}
-              type="checkbox"
-              className="peer cursor-pointer appearance-none w-5 h-5 border border-gray-400 rounded-[7px] bg-teal-600  transition"
-            />
-            <span className="absolute left-[4px] top-[-1px] text-white text-sm scale-0 peer-checked:scale-100 transition-transform pointer-events-none">
-              ✓
-            </span>
-          </span>
-          Lembrar meu usuário
-        </label>
-        <a href="#" className="text-[#1876D2] hover:underline">
-          Esqueci minha senha
-        </a>
-      </div> */}
+      <TextField
+        {...register("password")}
+        placeholder="Senha*"
+        type={showPassword ? "text" : "password"}
+        required
+        icon={
+          showPassword ? (
+            <EyeClosed className="hover: cursor-pointer" />
+          ) : (
+            <Eye className="hover: cursor-pointer" />
+          )
+        }
+        onIconClick={() => setShowPassword(!showPassword)}
+        error={!!errors.password}
+        errorMsg={errors?.password?.message || ""}
+      />
 
       <Button
         disabled={isLoading}

@@ -6,17 +6,20 @@ interface ISelectOption {
   label: string;
 }
 
-interface ISelectFieldProps
-  extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface ISelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   labelText?: string;
   optionSelectText?: string;
   options: ISelectOption[];
+  error?: boolean;
+  errorMsg?: string;
 }
 
 export function SelectField({
   labelText = "",
   optionSelectText = "",
   options,
+  error,
+  errorMsg,
   ...props
 }: ISelectFieldProps) {
   const id = useId();
@@ -40,7 +43,7 @@ export function SelectField({
           "border border-teal-400",
           "focus:outline-none",
           "focus:ring-1 focus:ring-teal-400",
-          props.className
+          props.className,
         )}
       >
         <option value={0}>{optionSelectText}</option>
@@ -55,6 +58,8 @@ export function SelectField({
           </option>
         ))}
       </select>
+
+      {error && <p className="text-red-500 text-sm ">{errorMsg}</p>}
     </div>
   );
 }
