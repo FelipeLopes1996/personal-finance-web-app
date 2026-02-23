@@ -65,8 +65,6 @@ const Expense = () => {
     },
   });
 
-  console.log("filters", filters);
-
   const {
     data: dataExpense = undefined,
     isLoading: dataExpenseIsLoading,
@@ -82,6 +80,8 @@ const Expense = () => {
           minValue: filters.minValue,
           maxValue: filters.maxValue,
           categoryId: filters.categoryId,
+          dateStart: filters.startDate,
+          endDate: filters.endDate,
         },
       });
       return response.data;
@@ -203,6 +203,8 @@ const Expense = () => {
           ? formatCurrency(String(filters.maxValue))
           : undefined,
         categoryId: filters.categoryId ?? undefined,
+        startDate: filters.startDate ?? undefined,
+        endDate: filters.endDate ?? undefined,
       }
     : undefined;
 
