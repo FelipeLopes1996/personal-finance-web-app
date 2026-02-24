@@ -1,4 +1,4 @@
-import { ShoppingCart, TableOfContents } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, TableOfContents } from "lucide-react";
 import clsx from "clsx";
 import { NavItem } from "../NavItem";
 
@@ -30,12 +30,12 @@ export default function Sidebar({ variant }: SidebarProps) {
         label="Categorias"
         isFooter={isFooter}
       />
-      {/* <NavItem
-          to="/dashboard"
-          icon={<Home />}
-          label="Dashboard"
-          isFooter={isFooter}
-        /> */}
+      <NavItem
+        to="/dashboard"
+        icon={<LayoutDashboard />}
+        label="Dashboard"
+        isFooter={isFooter}
+      />
       {/* <NavItem
         to="/profile"
         icon={<User />}
