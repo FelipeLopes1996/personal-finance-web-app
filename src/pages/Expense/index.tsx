@@ -57,20 +57,47 @@ const Expense = () => {
     return () => clearTimeout(timeout);
   }, [search]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading: isLoadingUser } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
       const response = await api.get(`/users/${userId}`);
       return response.data;
     },
   });
+  const { data: totalExpenseValue, isFetching: isFetchingTotalExpenseValue } =
+    useQuery({
+      queryKey: ["expenses", filters],
+      queryFn: async () => {
+        const response = await api.get("/expenses/total", {
+          params: {
+            categoryId: filters.categoryId,
+            dateStart: filters.startDate,
+            endDate: filters.endDate,
+          },
+        });
+        return response.data;
+      },
+    });
+
+  console.log("totalExpenseValue", totalExpenseValue);
+  console.log("isFetchingTotalExpenseValue", isFetchingTotalExpenseValue);
 
   const {
     data: dataExpense = undefined,
     isLoading: dataExpenseIsLoading,
     isFetching: dataExpenseIsFetching,
   } = useQuery({
-    queryKey: ["expenses", page, sizeExpense, filters],
+    queryKey: [
+      "expenses",
+      page,
+      sizeExpense,
+      filters?.text,
+      filters?.minValue,
+      filters?.maxValue,
+      filters?.categoryId,
+      filters?.startDate,
+      filters?.endDate,
+    ],
     queryFn: async () => {
       const response = await api.get<IPageResponse<IExpense>>(`/expenses`, {
         params: {
@@ -191,7 +218,12 @@ const Expense = () => {
   };
 
   const hasFilters = Boolean(
-    filters.text || filters.minValue || filters.maxValue || filters.categoryId,
+    filters.text ||
+    filters.minValue ||
+    filters.maxValue ||
+    filters.categoryId ||
+    filters.startDate ||
+    filters.endDate,
   );
 
   const filterDefaultValues = filters
@@ -210,7 +242,7 @@ const Expense = () => {
 
   return (
     <div className="flex flex-col ">
-      {isLoading || dataExpenseIsLoading || IsLoadingSystemCategories ? (
+      {isLoadingUser || dataExpenseIsLoading || IsLoadingSystemCategories ? (
         <>
           <Skeleton className="h-[10rem] w-full" />
           <Skeleton className="h-[20rem] w-full mt-[2rem]" />
@@ -226,11 +258,11 @@ const Expense = () => {
                 Lista de gastos
               </h2>
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md">
-                <div className="flex items-center gap-[1rem]">
+                <div className="flex items-center gap-[1rem] ">
                   <TextField
                     placeholder="Buscar por nome ou descrição"
                     onChange={({ target }) => setSearch(target.value)}
-                    className="ml-[0.1rem] w-[15.05rem] p-[0.7rem]"
+                    className="ml-[0.1rem] !w-[15.1rem]  p-[0.7rem]"
                   />
                   <div>
                     <Button
@@ -239,7 +271,7 @@ const Expense = () => {
                       textButton="text"
                     >
                       <ListFilter size={20} />
-                      <span className="hidden md:inline">Filtros</span>
+                      Filtros
                     </Button>
                   </div>
                 </div>
@@ -256,7 +288,11 @@ const Expense = () => {
               <ExpenseTable
                 data={dataExpense}
                 page={page}
-                loading={dataExpenseIsFetching}
+                loading={
+                  !dataExpenseIsLoading
+                    ? dataExpenseIsFetching
+                    : dataExpenseIsLoading
+                }
                 onPageChange={setPage}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
@@ -266,7 +302,10 @@ const Expense = () => {
         </>
       )}
       <>
-        {!dataExpense?.content?.length && !isLoading && !hasFilters ? (
+        {!dataExpense?.content?.length &&
+        !dataExpenseIsLoading &&
+        !isLoadingUser &&
+        !hasFilters ? (
           <NoDataContent
             handleAction={handleOrEditCreate}
             title="Você ainda não possui gastos"

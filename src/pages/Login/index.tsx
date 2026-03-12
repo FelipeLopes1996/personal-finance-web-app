@@ -1,4 +1,6 @@
+import { Button } from "@/components/Button";
 import LoginForm from "../../components/LoginForm";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   return (
@@ -7,6 +9,13 @@ const Login = () => {
         Acesse sua conta
       </h1>
       <LoginForm />
+      <div className="flex mt-[1.5rem] items-start w-[max-content]">
+        <Link to="/forgot-password">
+          <Button type="submit" textButton="text">
+            Esqueceu a senha?
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };
