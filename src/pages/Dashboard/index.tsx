@@ -112,7 +112,7 @@ const Dashboard = () => {
                             },
                             tooltip: {
                               y: {
-                                formatter: (val, { seriesIndex }) => {
+                                formatter: (_, { seriesIndex }) => {
                                   return currencyMask(
                                     String(
                                       dataChartsExpenses[
@@ -171,8 +171,8 @@ const Dashboard = () => {
                             chart: {
                               events: {
                                 dataPointSelection: (
-                                  event,
-                                  chartContext,
+                                  _,
+                                  _chartContext,
                                   config,
                                 ) => {
                                   if (config.dataPointIndex >= 0) {
