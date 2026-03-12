@@ -4,11 +4,13 @@ type CardType = {
   userName?: string;
   userSalary?: number;
   userExpenses?: number;
+  userTotalExpensePeriod?: number;
 };
 
 export function DashboardCard({
   userName,
   userSalary,
+  userTotalExpensePeriod,
 }: // userExpenses,
 CardType) {
   return (
@@ -35,13 +37,12 @@ CardType) {
         </div>
 
         {/* Despesa */}
-        {/* <div>
-          <p className="text-sm text-gray-500">despesa mensal</p>
+        <div>
+          <p className="text-sm text-gray-500">Despesa mensal</p>
           <p className="text-lg font-bold text-red-600">
-            {" "}
-            {userExpenses || "0"}
+            {formatCurrency(String(userTotalExpensePeriod || 0))}
           </p>
-        </div> */}
+        </div>
       </div>
     </div>
   );

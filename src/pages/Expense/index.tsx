@@ -23,7 +23,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { ListFilter, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 const sizeExpense = PER_PAGE;
 const sizeCategory = 100;
@@ -64,40 +64,26 @@ const Expense = () => {
       return response.data;
     },
   });
-  const { data: totalExpenseValue, isFetching: isFetchingTotalExpenseValue } =
-    useQuery({
-      queryKey: ["expenses", filters],
-      queryFn: async () => {
-        const response = await api.get("/expenses/total", {
-          params: {
-            categoryId: filters.categoryId,
-            dateStart: filters.startDate,
-            endDate: filters.endDate,
-          },
-        });
-        return response.data;
-      },
-    });
-
-  console.log("totalExpenseValue", totalExpenseValue);
-  console.log("isFetchingTotalExpenseValue", isFetchingTotalExpenseValue);
+  const { data: totalExpenseValue } = useQuery({
+    queryKey: ["expenses", filters],
+    queryFn: async () => {
+      const response = await api.get("/expenses/total", {
+        params: {
+          categoryId: filters.categoryId,
+          dateStart: filters.startDate,
+          endDate: filters.endDate,
+        },
+      });
+      return response.data;
+    },
+  });
 
   const {
     data: dataExpense = undefined,
     isLoading: dataExpenseIsLoading,
     isFetching: dataExpenseIsFetching,
   } = useQuery({
-    queryKey: [
-      "expenses",
-      page,
-      sizeExpense,
-      filters?.text,
-      filters?.minValue,
-      filters?.maxValue,
-      filters?.categoryId,
-      filters?.startDate,
-      filters?.endDate,
-    ],
+    queryKey: ["expenses", { page, size: sizeExpense, ...filters }],
     queryFn: async () => {
       const response = await api.get<IPageResponse<IExpense>>(`/expenses`, {
         params: {
@@ -217,28 +203,21 @@ const Expense = () => {
     setIsOpenFiltersModal(false);
   };
 
-  const hasFilters = Boolean(
-    filters.text ||
-    filters.minValue ||
-    filters.maxValue ||
-    filters.categoryId ||
-    filters.startDate ||
-    filters.endDate,
-  );
+  const hasFilters = useMemo(() => Boolean(
+    filters.text || filters.minValue || filters.maxValue || filters.categoryId || filters.startDate || filters.endDate
+  ), [filters]);
 
-  const filterDefaultValues = filters
-    ? {
-        minValue: filters.minValue
-          ? formatCurrency(String(filters.minValue))
-          : undefined,
-        maxValue: filters.maxValue
-          ? formatCurrency(String(filters.maxValue))
-          : undefined,
-        categoryId: filters.categoryId ?? undefined,
-        startDate: filters.startDate ?? undefined,
-        endDate: filters.endDate ?? undefined,
-      }
-    : undefined;
+  const filterDefaultValues = useMemo(() => filters ? {
+    minValue: filters.minValue
+      ? formatCurrency(String(filters.minValue))
+      : undefined,
+    maxValue: filters.maxValue
+      ? formatCurrency(String(filters.maxValue))
+      : undefined,
+    categoryId: filters.categoryId ?? undefined,
+    startDate: filters.startDate ?? undefined,
+    endDate: filters.endDate ?? undefined,
+  } : undefined, [filters]);
 
   return (
     <div className="flex flex-col ">
@@ -250,7 +229,11 @@ const Expense = () => {
       ) : (
         <>
           <h1 className="text-[2rem] mb-[2rem]">Gastos</h1>
-          <DashboardCard userName={data?.name} userSalary={data?.salary} />
+          <DashboardCard
+            userName={data?.name}
+            userSalary={data?.salary}
+            userTotalExpensePeriod={totalExpenseValue?.total}
+          />
 
           {!dataExpense?.content?.length && !hasFilters ? null : (
             <div className="w-full mt-[2rem] bg-white rounded-[4px] overflow-hidden md:shadow-md">
