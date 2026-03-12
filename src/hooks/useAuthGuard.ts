@@ -5,7 +5,7 @@ import { isTokenExpired } from "../utils/isTokenExpired";
 import { clearStorage } from "../utils/clearStorage";
 import { useAuth } from "./useAuth";
 
-const PUBLIC_ROUTES = ["/", "/login", "/register"];
+const PUBLIC_ROUTES = ["/", "/login", "/register", "/forgot-password"];
 
 export function useAuthGuard() {
   const { logout } = useAuth();

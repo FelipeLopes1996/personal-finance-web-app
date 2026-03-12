@@ -14,7 +14,7 @@ interface ITableProps {
   onPageChange: (page: number) => void;
 }
 
-const HEADE_NAMES = [
+const COLUMNS_NAMES = [
   "Nome",
   "Descrição",
   "Categoria",
@@ -38,7 +38,7 @@ const ExpenseTable = ({
         <table className="w-full table-auto text-left bg-white  shadow-[6px_0_10px_-6px_rgba(0,0,0,0.15),_-6px_0_10px_-6px_rgba(0,0,0,0.15)]">
           <thead>
             <tr>
-              {HEADE_NAMES.map((name) => (
+              {COLUMNS_NAMES.map((name) => (
                 <th
                   key={name}
                   scope="col"
@@ -153,7 +153,7 @@ const ExpenseTable = ({
               </p>
               {item.date ? (
                 <p>
-                  <span className="font-semibold">Valor:</span>{" "}
+                  <span className="font-semibold">Data:</span>{" "}
                   {formatters.formatDateBR(item.date)}
                 </p>
               ) : null}

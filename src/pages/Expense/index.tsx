@@ -10,6 +10,7 @@ import NoDataContent from "@/components/NoDataContent";
 import { Skeleton } from "@/components/Skeleton";
 import { TextField } from "@/components/TextField";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { ICategory } from "@/types/ICategory";
 import type { ICreateOrEditExpense, IExpense } from "@/types/IExpense";
 import type { IExpenseFilters } from "@/types/IExpenseFilters";
@@ -23,7 +24,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { ListFilter, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 
 const sizeExpense = PER_PAGE;
 const sizeCategory = 100;
@@ -45,22 +46,34 @@ const Expense = () => {
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<IExpenseFilters>({});
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setFilters((prev) => ({
-        ...prev,
-        text: search,
-      }));
-    }, 500);
+  // Atualizar filtros quando a busca debounceada mudar
+  useMemo(() => {
+    setFilters((prev) => ({
+      ...prev,
+      text: debouncedSearch,
+    }));
+  }, [debouncedSearch]);
 
-    return () => clearTimeout(timeout);
-  }, [search]);
-
-  const { data, isLoading } = useQuery({
+  const { data, isLoading: isLoadingUser } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
       const response = await api.get(`/users/${userId}`);
+      return response.data;
+    },
+  });
+  const { data: totalExpenseValue } = useQuery({
+    queryKey: ["expenses", filters],
+    queryFn: async () => {
+      const response = await api.get("/expenses/total", {
+        params: {
+          categoryId: filters.categoryId,
+          dateStart: filters.startDate,
+          dateEnd: filters.endDate,
+          descripion: filters.text,
+        },
+      });
       return response.data;
     },
   });
@@ -70,7 +83,7 @@ const Expense = () => {
     isLoading: dataExpenseIsLoading,
     isFetching: dataExpenseIsFetching,
   } = useQuery({
-    queryKey: ["expenses", page, sizeExpense, filters],
+    queryKey: ["expenses", { page, size: sizeExpense, ...filters }],
     queryFn: async () => {
       const response = await api.get<IPageResponse<IExpense>>(`/expenses`, {
         params: {
@@ -122,8 +135,11 @@ const Expense = () => {
       setExpenseId(0);
       setIsOpenDeleteModal(false);
     },
-    onError: (response) => {
-      console.log(response);
+    onError: () => {
+      CustomToast({
+        title: "Erro ao excluir gasto. Tente novamente.",
+        status: "error",
+      });
     },
   });
 
@@ -141,8 +157,11 @@ const Expense = () => {
       });
       setIsOpenCreateOrEditModal(false);
     },
-    onError: (response) => {
-      console.log(response);
+    onError: () => {
+      CustomToast({
+        title: "Erro ao adicionar gasto. Tente novamente.",
+        status: "error",
+      });
     },
   });
 
@@ -161,56 +180,72 @@ const Expense = () => {
       });
       setIsOpenCreateOrEditModal(false);
     },
-    onError: (response) => {
-      console.log(response);
+    onError: () => {
+      CustomToast({
+        title: "Erro ao salvar gasto. Tente novamente.",
+        status: "error",
+      });
     },
   });
 
-  const handleOrEditCreate = () => {
+  const handleOrEditCreate = useCallback(() => {
     setIsOpenCreateOrEditModal(true);
-  };
+  }, []);
 
-  const handleEdit = (edit: IExpense) => {
+  const handleEdit = useCallback((edit: IExpense) => {
     setEditExpenseValues(edit);
     setIsOpenCreateOrEditModal(true);
-  };
+  }, []);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = useCallback((id: number) => {
     setIsOpenDeleteModal(true);
     setExpenseId(id);
-  };
+  }, []);
 
-  const handleCloseCreateOrEdit = () => {
+  const handleCloseCreateOrEdit = useCallback(() => {
     setEditExpenseValues(null);
     setIsOpenCreateOrEditModal(false);
-  };
+  }, []);
 
-  const handleSetFilters = (filters: IExpenseFilters) => {
-    setFilters(filters);
+  const handleSetFilters = useCallback((newFilters: IExpenseFilters) => {
+    setFilters(newFilters);
     setIsOpenFiltersModal(false);
-  };
+  }, []);
 
-  const hasFilters = Boolean(
-    filters.text || filters.minValue || filters.maxValue || filters.categoryId,
+  const hasFilters = useMemo(
+    () =>
+      Boolean(
+        filters.text ||
+        filters.minValue ||
+        filters.maxValue ||
+        filters.categoryId ||
+        filters.startDate ||
+        filters.endDate,
+      ),
+    [filters],
   );
 
-  const filterDefaultValues = filters
-    ? {
-        minValue: filters.minValue
-          ? formatCurrency(String(filters.minValue))
-          : undefined,
-        maxValue: filters.maxValue
-          ? formatCurrency(String(filters.maxValue))
-          : undefined,
-        categoryId: filters.categoryId ?? undefined,
-        startDate: filters.startDate ?? undefined,
-        endDate: filters.endDate ?? undefined,
-      }
-    : undefined;
+  const filterDefaultValues = useMemo(
+    () =>
+      filters
+        ? {
+            minValue: filters.minValue
+              ? formatCurrency(String(filters.minValue))
+              : undefined,
+            maxValue: filters.maxValue
+              ? formatCurrency(String(filters.maxValue))
+              : undefined,
+            categoryId: filters.categoryId ?? undefined,
+            startDate: filters.startDate ?? undefined,
+            endDate: filters.endDate ?? undefined,
+          }
+        : undefined,
+    [filters],
+  );
 
   return (
     <div className="flex flex-col ">
-      {isLoading || dataExpenseIsLoading || IsLoadingSystemCategories ? (
+      {isLoadingUser || dataExpenseIsLoading || IsLoadingSystemCategories ? (
         <>
           <Skeleton className="h-[10rem] w-full" />
           <Skeleton className="h-[20rem] w-full mt-[2rem]" />
@@ -218,7 +253,11 @@ const Expense = () => {
       ) : (
         <>
           <h1 className="text-[2rem] mb-[2rem]">Gastos</h1>
-          <DashboardCard userName={data?.name} userSalary={data?.salary} />
+          <DashboardCard
+            userName={data?.name}
+            userSalary={data?.salary}
+            userTotalExpensePeriod={totalExpenseValue?.total}
+          />
 
           {!dataExpense?.content?.length && !hasFilters ? null : (
             <div className="w-full mt-[2rem] bg-white rounded-[4px] overflow-hidden md:shadow-md">
@@ -226,11 +265,11 @@ const Expense = () => {
                 Lista de gastos
               </h2>
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white pb-6 md:p-6 shadow-none md:shadow-md">
-                <div className="flex items-center gap-[1rem]">
+                <div className="flex items-center gap-[1rem] ">
                   <TextField
                     placeholder="Buscar por nome ou descrição"
                     onChange={({ target }) => setSearch(target.value)}
-                    className="ml-[0.1rem] w-[15.05rem] p-[0.7rem]"
+                    className="ml-[0.1rem] !w-[15.1rem]  p-[0.7rem]"
                   />
                   <div>
                     <Button
@@ -245,7 +284,7 @@ const Expense = () => {
                 </div>
                 <div>
                   <Button
-                    className="flex items-center justify-center gap-1.5 items-center p-[0.8rem]"
+                    className="flex items-center justify-center gap-1.5 p-[0.8rem]"
                     onClick={handleOrEditCreate}
                   >
                     <Plus size={20} />
@@ -256,7 +295,11 @@ const Expense = () => {
               <ExpenseTable
                 data={dataExpense}
                 page={page}
-                loading={dataExpenseIsFetching}
+                loading={
+                  !dataExpenseIsLoading
+                    ? dataExpenseIsFetching
+                    : dataExpenseIsLoading
+                }
                 onPageChange={setPage}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
@@ -266,7 +309,10 @@ const Expense = () => {
         </>
       )}
       <>
-        {!dataExpense?.content?.length && !isLoading && !hasFilters ? (
+        {!dataExpense?.content?.length &&
+        !dataExpenseIsLoading &&
+        !isLoadingUser &&
+        !hasFilters ? (
           <NoDataContent
             handleAction={handleOrEditCreate}
             title="Você ainda não possui gastos"
@@ -279,7 +325,6 @@ const Expense = () => {
         title="Filtros"
         isForm={true}
         onConfirm={() => {}}
-        isLoading={deleteExpenseMutation.isPending}
       >
         <ExpenseFiltersForm
           categories={dataSystemCategories || []}
@@ -304,13 +349,10 @@ const Expense = () => {
         onClose={handleCloseCreateOrEdit}
         title={editExpenseValues ? "Editar Gasto" : "Adicionar Gasto"}
         onConfirm={() => {}}
-        isLoading={deleteExpenseMutation.isPending}
       >
         <ExpenseForm
           isLoading={
-            createExpenseMutation.isPending ||
-            editExpenseMutation.isPending ||
-            false
+            createExpenseMutation.isPending || editExpenseMutation.isPending
           }
           sendCreateOrEditExpense={
             editExpenseValues

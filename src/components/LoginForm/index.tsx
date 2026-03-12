@@ -58,12 +58,6 @@ export default function LoginForm() {
       const decodeToken = decodeJwt(data || "");
       setUserId(JSON.stringify(decodeToken?.userId));
 
-      // if (isRememberUser) {
-      //   localStorage.setItem(
-      //     "@loomi-remember-user",
-      //     JSON.stringify({ email, password, isRememberUser })
-      //   );
-      // }
       setIsLoading(false);
       CustomToast({
         title: "Usuário logado com sucesso",

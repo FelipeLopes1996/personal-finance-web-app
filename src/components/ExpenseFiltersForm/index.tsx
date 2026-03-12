@@ -13,20 +13,12 @@ import {
 import type { IExpenseFilters } from "@/types/IExpenseFilters";
 import { currencyMask } from "@/utils/formatCurrency";
 import { parseCurrencyToNumber } from "@/utils/parseCurrencyToNumber";
-import { todayISO } from "@/utils/todayISO";
+import { DateRangeField } from "../DateRangeField";
 
 interface IExpenseFilterForm {
   categories: ICategory[];
   handleSetFilters: (filters: IExpenseFilters) => void;
   defaultValues?: Partial<ExpenseFilterSchemaType> | undefined;
-}
-
-function getMinDate(dateA?: string, dateB?: string) {
-  if (!dateA) return dateB;
-
-  if (!dateB) return dateA;
-
-  return new Date(dateA) < new Date(dateB) ? dateA : dateB;
 }
 
 const ExpenseFiltersForm = ({
@@ -40,22 +32,11 @@ const ExpenseFiltersForm = ({
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<ExpenseFilterSchemaType>({
     resolver: zodResolver(ExpenseFilterSchema),
     defaultValues,
   });
-
-  const startDate = watch("startDate");
-  const endDate = watch("endDate");
-
-  function addDays(date: string, days: number) {
-    const d = new Date(date);
-    d.setDate(d.getDate() + days);
-    return d.toISOString().split("T")[0];
-  }
-
-  const today = todayISO();
 
   const onSubmit = ({
     minValue,
@@ -118,23 +99,12 @@ const ExpenseFiltersForm = ({
         labelText="Categorias:"
         options={categoryOptions}
       />
-      <TextField
-        type="date"
-        labelText="Data início:"
-        max={endDate ? endDate : today}
-        error={!!errors.startDate}
-        errorMsg={errors.startDate?.message}
-        {...register("startDate")}
-      />
-
-      <TextField
-        type="date"
-        labelText="Data final:"
-        min={startDate}
-        max={startDate ? getMinDate(addDays(startDate, 30), today) : today}
-        error={!!errors.endDate}
-        errorMsg={errors.endDate?.message}
-        {...register("endDate")}
+      <DateRangeField
+        register={register}
+        watch={watch}
+        setValue={setValue}
+        errors={errors}
+        dirtyFields={dirtyFields}
       />
 
       <div className="flex gap-4">
