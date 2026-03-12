@@ -83,7 +83,7 @@ export default function ExpenseForm({
 
       <TextField
         {...register("description")}
-        placeholder="Descrição*"
+        placeholder="Descrição"
         error={!!errors.description}
         errorMsg={errors?.description?.message || ""}
       />
