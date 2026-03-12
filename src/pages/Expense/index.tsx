@@ -10,6 +10,7 @@ import NoDataContent from "@/components/NoDataContent";
 import { Skeleton } from "@/components/Skeleton";
 import { TextField } from "@/components/TextField";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { ICategory } from "@/types/ICategory";
 import type { ICreateOrEditExpense, IExpense } from "@/types/IExpense";
 import type { IExpenseFilters } from "@/types/IExpenseFilters";
@@ -23,7 +24,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { ListFilter, Plus } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 
 const sizeExpense = PER_PAGE;
 const sizeCategory = 100;
@@ -45,17 +46,15 @@ const Expense = () => {
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<IExpenseFilters>({});
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setFilters((prev) => ({
-        ...prev,
-        text: search,
-      }));
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, [search]);
+  // Atualizar filtros quando a busca debounceada mudar
+  useMemo(() => {
+    setFilters((prev) => ({
+      ...prev,
+      text: debouncedSearch,
+    }));
+  }, [debouncedSearch]);
 
   const { data, isLoading: isLoadingUser } = useQuery({
     queryKey: ["users"],
@@ -71,7 +70,8 @@ const Expense = () => {
         params: {
           categoryId: filters.categoryId,
           dateStart: filters.startDate,
-          endDate: filters.endDate,
+          dateEnd: filters.endDate,
+          descripion: filters.text,
         },
       });
       return response.data;
@@ -135,8 +135,11 @@ const Expense = () => {
       setExpenseId(0);
       setIsOpenDeleteModal(false);
     },
-    onError: (response) => {
-      console.log(response);
+    onError: () => {
+      CustomToast({
+        title: "Erro ao excluir gasto. Tente novamente.",
+        status: "error",
+      });
     },
   });
 
@@ -154,8 +157,11 @@ const Expense = () => {
       });
       setIsOpenCreateOrEditModal(false);
     },
-    onError: (response) => {
-      console.log(response);
+    onError: () => {
+      CustomToast({
+        title: "Erro ao adicionar gasto. Tente novamente.",
+        status: "error",
+      });
     },
   });
 
@@ -174,50 +180,68 @@ const Expense = () => {
       });
       setIsOpenCreateOrEditModal(false);
     },
-    onError: (response) => {
-      console.log(response);
+    onError: () => {
+      CustomToast({
+        title: "Erro ao salvar gasto. Tente novamente.",
+        status: "error",
+      });
     },
   });
 
-  const handleOrEditCreate = () => {
+  const handleOrEditCreate = useCallback(() => {
     setIsOpenCreateOrEditModal(true);
-  };
+  }, []);
 
-  const handleEdit = (edit: IExpense) => {
+  const handleEdit = useCallback((edit: IExpense) => {
     setEditExpenseValues(edit);
     setIsOpenCreateOrEditModal(true);
-  };
+  }, []);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = useCallback((id: number) => {
     setIsOpenDeleteModal(true);
     setExpenseId(id);
-  };
+  }, []);
 
-  const handleCloseCreateOrEdit = () => {
+  const handleCloseCreateOrEdit = useCallback(() => {
     setEditExpenseValues(null);
     setIsOpenCreateOrEditModal(false);
-  };
+  }, []);
 
-  const handleSetFilters = (filters: IExpenseFilters) => {
-    setFilters(filters);
+  const handleSetFilters = useCallback((newFilters: IExpenseFilters) => {
+    setFilters(newFilters);
     setIsOpenFiltersModal(false);
-  };
+  }, []);
 
-  const hasFilters = useMemo(() => Boolean(
-    filters.text || filters.minValue || filters.maxValue || filters.categoryId || filters.startDate || filters.endDate
-  ), [filters]);
+  const hasFilters = useMemo(
+    () =>
+      Boolean(
+        filters.text ||
+        filters.minValue ||
+        filters.maxValue ||
+        filters.categoryId ||
+        filters.startDate ||
+        filters.endDate,
+      ),
+    [filters],
+  );
 
-  const filterDefaultValues = useMemo(() => filters ? {
-    minValue: filters.minValue
-      ? formatCurrency(String(filters.minValue))
-      : undefined,
-    maxValue: filters.maxValue
-      ? formatCurrency(String(filters.maxValue))
-      : undefined,
-    categoryId: filters.categoryId ?? undefined,
-    startDate: filters.startDate ?? undefined,
-    endDate: filters.endDate ?? undefined,
-  } : undefined, [filters]);
+  const filterDefaultValues = useMemo(
+    () =>
+      filters
+        ? {
+            minValue: filters.minValue
+              ? formatCurrency(String(filters.minValue))
+              : undefined,
+            maxValue: filters.maxValue
+              ? formatCurrency(String(filters.maxValue))
+              : undefined,
+            categoryId: filters.categoryId ?? undefined,
+            startDate: filters.startDate ?? undefined,
+            endDate: filters.endDate ?? undefined,
+          }
+        : undefined,
+    [filters],
+  );
 
   return (
     <div className="flex flex-col ">
@@ -254,13 +278,13 @@ const Expense = () => {
                       textButton="text"
                     >
                       <ListFilter size={20} />
-                      Filtros
+                      <span className="hidden md:inline">Filtros</span>
                     </Button>
                   </div>
                 </div>
                 <div>
                   <Button
-                    className="flex items-center justify-center gap-1.5 items-center p-[0.8rem]"
+                    className="flex items-center justify-center gap-1.5 p-[0.8rem]"
                     onClick={handleOrEditCreate}
                   >
                     <Plus size={20} />
@@ -301,7 +325,6 @@ const Expense = () => {
         title="Filtros"
         isForm={true}
         onConfirm={() => {}}
-        isLoading={deleteExpenseMutation.isPending}
       >
         <ExpenseFiltersForm
           categories={dataSystemCategories || []}
@@ -326,13 +349,10 @@ const Expense = () => {
         onClose={handleCloseCreateOrEdit}
         title={editExpenseValues ? "Editar Gasto" : "Adicionar Gasto"}
         onConfirm={() => {}}
-        isLoading={deleteExpenseMutation.isPending}
       >
         <ExpenseForm
           isLoading={
-            createExpenseMutation.isPending ||
-            editExpenseMutation.isPending ||
-            false
+            createExpenseMutation.isPending || editExpenseMutation.isPending
           }
           sendCreateOrEditExpense={
             editExpenseValues

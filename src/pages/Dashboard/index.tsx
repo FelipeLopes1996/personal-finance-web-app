@@ -65,7 +65,7 @@ const Dashboard = () => {
               <h2 className="mb-[0.5rem] mt-[0.5rem] text-[1.2rem]">
                 Filtrar Por
               </h2>
-              <form className="flex items-center gap-5.5 mb-[1.5rem] ">
+              <form className="flex flex-col md:flex-row md:items-center gap-5.5 mb-[1.5rem] ">
                 <DateRangeField
                   register={register}
                   watch={watch}
