@@ -8,6 +8,7 @@ import { DateRangeField } from "@/components/DateRangeField";
 import { useForm } from "react-hook-form";
 import NoDataContent from "@/components/NoDataContent";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Dashboard = () => {
   const {
@@ -17,6 +18,10 @@ const Dashboard = () => {
     formState: { errors, dirtyFields },
   } = useForm({});
   const navigate = useNavigate();
+
+  const [selectedSliceIndex, setSelectedSliceIndex] = useState<number | null>(
+    null,
+  );
 
   const startDate = watch("startDate");
   const endDate = watch("endDate");
@@ -48,6 +53,15 @@ const Dashboard = () => {
   const handleGoToExpenseScreen = () => {
     navigate("/expense");
   };
+
+  const selectedValue =
+    selectedSliceIndex !== null && dataChartsExpenses
+      ? currencyMask(
+          String(dataChartsExpenses[selectedSliceIndex]?.value.toFixed(2)),
+        )
+      : totalExpense;
+
+  console.log("selectedValue", selectedValue);
 
   return (
     <div className="flex flex-col ">
@@ -85,22 +99,89 @@ const Dashboard = () => {
                           Resumo por categoria
                         </h2>
                         <Chart
+                          key={selectedSliceIndex}
                           type="donut"
                           series={dataChartsExpenses?.map((d) => d.percentage)}
                           options={{
                             labels: dataChartsExpenses?.map((d) => d.category),
                             legend: { position: "bottom" },
+
+                            dataLabels: {
+                              enabled: true,
+                              formatter: (val) => `${Number(val).toFixed(2)}%`,
+                            },
+                            tooltip: {
+                              y: {
+                                formatter: (val, { seriesIndex }) => {
+                                  return currencyMask(
+                                    String(
+                                      dataChartsExpenses[
+                                        seriesIndex
+                                      ]?.value.toFixed(2),
+                                    ),
+                                  );
+                                },
+                              },
+                            },
                             plotOptions: {
                               pie: {
                                 donut: {
                                   labels: {
                                     show: true,
+
+                                    name: {
+                                      show: true,
+                                      formatter: () =>
+                                        selectedSliceIndex !== null
+                                          ? dataChartsExpenses[
+                                              selectedSliceIndex
+                                            ]?.category
+                                          : "Total",
+                                    },
+
+                                    value: {
+                                      show: true,
+                                      formatter: () => {
+                                        if (
+                                          selectedSliceIndex !== null &&
+                                          dataChartsExpenses[selectedSliceIndex]
+                                        ) {
+                                          return currencyMask(
+                                            String(
+                                              dataChartsExpenses[
+                                                selectedSliceIndex
+                                              ].value.toFixed(2),
+                                            ),
+                                          );
+                                        }
+
+                                        return totalExpense;
+                                      },
+                                    },
+
                                     total: {
                                       show: true,
                                       label: "Total",
-                                      formatter: () => totalExpense,
+                                      formatter: () => selectedValue,
                                     },
                                   },
+                                },
+                              },
+                            },
+                            chart: {
+                              events: {
+                                dataPointSelection: (
+                                  event,
+                                  chartContext,
+                                  config,
+                                ) => {
+                                  if (config.dataPointIndex >= 0) {
+                                    setSelectedSliceIndex((prev) =>
+                                      prev === config.dataPointIndex
+                                        ? null
+                                        : config.dataPointIndex,
+                                    );
+                                  }
                                 },
                               },
                             },
