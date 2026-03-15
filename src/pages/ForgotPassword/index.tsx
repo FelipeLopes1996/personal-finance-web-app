@@ -36,7 +36,7 @@ const ForgotPassword = () => {
       setIsLoading(false);
       CustomToast({
         title: "Email enviado com sucesso!",
-        description: "Seja Bem vindo!",
+        description: "Verifique sua caixa de e-mail!",
         status: "success",
       });
     } else {
@@ -55,10 +55,10 @@ const ForgotPassword = () => {
       <h1 className="text-[1.7rem] md:text-[2rem] font-extrabold mb-10 text-black leading-tight mx-auto text-center">
         Esqueceu a senha?
       </h1>
-      <span>Redefina a senha em duas etapas</span>
+      <span>Digite seu e-mail para recuperar a senha</span>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[1.5rem]"
+        className="flex flex-col gap-[1.5rem] mt-[0.5rem]"
       >
         <TextField
           {...register("email")}
