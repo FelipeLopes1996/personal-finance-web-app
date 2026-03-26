@@ -11,8 +11,7 @@ export function DashboardCard({
   userName,
   userSalary,
   userTotalExpensePeriod,
-}: // userExpenses,
-CardType) {
+}: CardType) {
   return (
     <div className="w-full rounded-[4px] bg-white p-6 shadow-md">
       {/* Header */}
@@ -22,13 +21,9 @@ CardType) {
             Olá, {userName || "-"}
           </p>
         </div>
-
-        {/* <div className="rounded-full bg-gray-100 p-2">📊</div> */}
       </div>
 
-      {/* Valores */}
-      <div className="flex justify-between gap-6">
-        {/* Receita */}
+      <div className="flex gap-[3rem]">
         <div>
           <p className="text-sm text-gray-500">Salário mensal</p>
           <p className="text-lg font-bold text-green-600">
@@ -36,7 +31,6 @@ CardType) {
           </p>
         </div>
 
-        {/* Despesa */}
         <div>
           <p className="text-sm text-gray-500">Despesa mensal</p>
           <p className="text-lg font-bold text-red-600">

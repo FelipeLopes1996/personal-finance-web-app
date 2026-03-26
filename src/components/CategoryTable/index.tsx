@@ -50,6 +50,7 @@ const CategoryTable = ({
                   <td className="px-4 py-2 whitespace-nowrap">{item.name}</td>
                   <td className="px-4 py-2 w-[20%]">
                     <button
+                      disabled={item.categoryType === "SYSTEM"}
                       onClick={() => {
                         if (!item.id) return;
                         onEdit({
@@ -57,15 +58,30 @@ const CategoryTable = ({
                           name: item.name,
                         });
                       }}
-                      className="px-2 py-1 mr-[0.5rem] text-white rounded hover:bg-blue-100 transition cursor-pointer"
+                      className="px-2 py-1 mr-[0.5rem] text-white rounded hover:bg-transparent transition cursor-pointer"
                     >
-                      <Pencil size={20} className="text-blue-500" />
+                      <Pencil
+                        size={20}
+                        className={
+                          item.categoryType === "SYSTEM"
+                            ? "text-[#CCC]"
+                            : "text-blue-500"
+                        }
+                      />
                     </button>
                     <button
+                      disabled={item.categoryType === "SYSTEM"}
                       onClick={() => onDelete(item.id || 0)}
-                      className="px-2 py-1  text-white rounded hover:bg-red-100 transition cursor-pointer"
+                      className="px-2 py-1  text-white rounded hover:bg-transparent transition cursor-pointer"
                     >
-                      <Trash size={20} className="text-red-500" />
+                      <Trash
+                        size={20}
+                        className={
+                          item.categoryType === "SYSTEM"
+                            ? "text-[#CCC]"
+                            : "text-red-500"
+                        }
+                      />
                     </button>
                   </td>
                 </tr>
@@ -113,13 +129,13 @@ const CategoryTable = ({
                       name: item.name,
                     });
                   }}
-                  className="flex-1 px-2 py-1 flex justify-center items-center rounded hover:bg-blue-100 transition cursor-pointer"
+                  className="flex-1 px-2 py-1 flex justify-center items-center rounded hover:bg-transparent transition cursor-pointer"
                 >
                   <Pencil size={20} className="text-blue-500" />
                 </button>
                 <button
                   onClick={() => onDelete(item.id || 0)}
-                  className="flex-1 px-2 py-1 flex justify-center items-center rounded hover:bg-red-100 transition cursor-pointer"
+                  className="flex-1 px-2 py-1 flex justify-center items-center rounded hover:bg-transparent transition cursor-pointer"
                 >
                   <Trash size={20} className="text-red-500" />
                 </button>
