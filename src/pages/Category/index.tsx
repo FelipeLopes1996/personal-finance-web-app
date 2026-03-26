@@ -45,12 +45,15 @@ const Category = () => {
   } = useQuery({
     queryKey: ["categories", page, size],
     queryFn: async () => {
-      const response = await api.get<IPageResponse<ICategory>>(`/categories`, {
-        params: {
-          page,
-          size,
+      const response = await api.get<IPageResponse<ICategory>>(
+        `/categories/available`,
+        {
+          params: {
+            page,
+            size,
+          },
         },
-      });
+      );
       return response.data;
     },
     placeholderData: keepPreviousData,
