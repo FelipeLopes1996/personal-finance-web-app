@@ -14,11 +14,28 @@ interface ITableProps {
   onPageChange: (page: number) => void;
 }
 
+const paymentMethodLabel = (paymentMethod?: IExpense["paymentMethod"]) => {
+  switch (paymentMethod) {
+    case "PIX":
+      return "PIX";
+    case "CREDITO":
+      return "Crédito";
+    case "DEBITO":
+      return "Débito";
+    case "DINHEIRO":
+      return "Dinheiro";
+    default:
+      return "-";
+  }
+};
+
 const COLUMNS_NAMES = [
   "Nome",
   "Descrição",
   "Categoria",
   "Valor",
+  "Forma de pagamento",
+  "Nome no cartão",
   "Data",
   "Ações",
 ];
@@ -63,6 +80,10 @@ const ExpenseTable = ({
                       })}
                     </td>
                     <td className="px-4 py-2">
+                      {paymentMethodLabel(item.paymentMethod)}
+                    </td>
+                    <td className="px-4 py-2">{item.nameCard?.trim() || "-"}</td>
+                    <td className="px-4 py-2">
                       {item.date ? formatters.formatDateBR(item.date) : "-"}
                     </td>
                     <td className="px-4 py-2 flex gap-2">
@@ -75,6 +96,8 @@ const ExpenseTable = ({
                             value: item.value,
                             categoryId: item.categoryId,
                             date: item.date,
+                            paymentMethod: item.paymentMethod,
+                            nameCard: item.nameCard,
                           })
                         }
                         className="px-2 py-1  text-white rounded hover:bg-blue-100 transition cursor-pointer"
@@ -93,14 +116,14 @@ const ExpenseTable = ({
               : null}
             {loading && (
               <tr>
-                <td colSpan={6} className="px-4 py-4 text-center">
+                <td colSpan={8} className="px-4 py-4 text-center">
                   <SpinnerLoading width="10" height="6" />
                 </td>
               </tr>
             )}
             {!loading && !data?.content?.length && (
               <tr>
-                <td colSpan={6} className="px-4 py-4 text-center">
+                <td colSpan={8} className="px-4 py-4 text-center">
                   Nehum resultado encontrado
                 </td>
               </tr>
@@ -151,6 +174,14 @@ const ExpenseTable = ({
                   currency: "BRL",
                 })}
               </p>
+              <p>
+                <span className="font-semibold">Forma de pagamento:</span>{" "}
+                {paymentMethodLabel(item.paymentMethod)}
+              </p>
+              <p>
+                <span className="font-semibold">Nome no cartão:</span>{" "}
+                {item.nameCard?.trim() || "-"}
+              </p>
               {item.date ? (
                 <p>
                   <span className="font-semibold">Data:</span>{" "}
@@ -167,6 +198,8 @@ const ExpenseTable = ({
                       value: item.value,
                       categoryId: item.categoryId,
                       date: item.date,
+                      paymentMethod: item.paymentMethod,
+                      nameCard: item.nameCard,
                     })
                   }
                   className="flex-1 px-2 py-1 flex justify-center items-center rounded hover:bg-blue-100 transition cursor-pointer"
