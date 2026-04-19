@@ -1,3 +1,5 @@
+export type PaymentMethod = "PIX" | "CREDITO" | "DEBITO" | "DINHEIRO";
+
 export interface IExpense {
   id: number;
   name: string;
@@ -6,6 +8,8 @@ export interface IExpense {
   categoryId?: number;
   cateroryName?: string;
   date?: string;
+  paymentMethod?: PaymentMethod;
+  nameCard?: string;
 }
 
 export interface ICreateOrEditExpense {
@@ -14,5 +18,7 @@ export interface ICreateOrEditExpense {
   description?: string;
   value: number;
   categoryId?: number | null;
-  date?: string;
+  localDate?: string;
+  paymentMethod: PaymentMethod;
+  nameCard?: string;
 }

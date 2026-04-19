@@ -367,6 +367,8 @@ const Expense = () => {
                   value: formatCurrency(String(editExpenseValues?.value || 0)),
                   categoryId: editExpenseValues?.categoryId ?? 0,
                   localDate: editExpenseValues?.date,
+                  paymentMethod: editExpenseValues?.paymentMethod ?? "PIX",
+                  nameCard: editExpenseValues?.nameCard ?? "",
                 }
               : undefined
           }
