@@ -12,6 +12,20 @@ export const ExpenseSchema = z.object({
   localDate: z
     .string()
     .refine((value) => !isNaN(Date.parse(value)), "Data inválida"),
+  paymentMethod: z.enum(["PIX", "CREDITO", "DEBITO", "DINHEIRO"], {
+    required_error: "Forma de pagamento é obrigatória",
+  }),
+  nameCard: z.string().optional().or(z.literal("")),
+}).superRefine(({ paymentMethod, nameCard }, ctx) => {
+  const needsCardName = paymentMethod === "CREDITO" || paymentMethod === "DEBITO";
+
+  if (needsCardName && !nameCard?.trim()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Nome do cartão é obrigatório",
+      path: ["nameCard"],
+    });
+  }
 });
 
 export type ExpenseSchemaType = z.infer<typeof ExpenseSchema>;

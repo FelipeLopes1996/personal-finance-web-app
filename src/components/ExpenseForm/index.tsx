@@ -20,6 +20,13 @@ interface IExpenseForm {
   categories: ICategory[] | [];
 }
 
+const PAYMENT_METHOD_OPTIONS = [
+  { value: "PIX", label: "PIX" },
+  { value: "CREDITO", label: "Crédito" },
+  { value: "DEBITO", label: "Débito" },
+  { value: "DINHEIRO", label: "Dinheiro" },
+];
+
 export default function ExpenseForm({
   isLoading,
   sendCreateOrEditExpense,
@@ -31,6 +38,7 @@ export default function ExpenseForm({
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors },
   } = useForm<ExpenseSchemaType>({
     resolver: zodResolver(ExpenseSchema),
@@ -43,6 +51,8 @@ export default function ExpenseForm({
     value,
     categoryId,
     localDate,
+    paymentMethod,
+    nameCard,
   }: ExpenseSchemaType) => {
     const bodyRequest = {
       name,
@@ -50,6 +60,11 @@ export default function ExpenseForm({
       value: parseCurrencyToNumber(value),
       categoryId: categoryId === 0 ? null : categoryId,
       localDate,
+      paymentMethod,
+      nameCard:
+        paymentMethod === "CREDITO" || paymentMethod === "DEBITO"
+          ? nameCard?.trim()
+          : undefined,
     };
     if (errors.description || errors.name || errors.value) return;
     sendCreateOrEditExpense(bodyRequest);
@@ -61,13 +76,25 @@ export default function ExpenseForm({
     ? categories.map(({ id, name }) => ({ value: id, label: name }))
     : [];
 
+  const paymentMethod = watch("paymentMethod");
+  const needsCardName =
+    paymentMethod === "CREDITO" || paymentMethod === "DEBITO";
+
   useEffect(() => {
     if (!defaultValues?.name) {
       reset({
         localDate: todayISO(),
+        paymentMethod: "PIX",
+        nameCard: "",
       });
     }
   }, [defaultValues, reset]);
+
+  useEffect(() => {
+    if (!needsCardName) {
+      setValue("nameCard", "", { shouldDirty: true, shouldValidate: true });
+    }
+  }, [needsCardName, setValue]);
 
   return (
     <form
@@ -113,6 +140,23 @@ export default function ExpenseForm({
         error={!!errors.categoryId}
         errorMsg={errors?.categoryId?.message || ""}
       />
+
+      <SelectField
+        {...register("paymentMethod")}
+        optionSelectText="Selecione a forma de pagamento"
+        options={PAYMENT_METHOD_OPTIONS}
+        error={!!errors.paymentMethod}
+        errorMsg={errors?.paymentMethod?.message || ""}
+      />
+
+      {needsCardName ? (
+        <TextField
+          {...register("nameCard")}
+          placeholder="Nome no cartão*"
+          error={!!errors.nameCard}
+          errorMsg={errors?.nameCard?.message || ""}
+        />
+      ) : null}
 
       <TextField type="date" {...register("localDate")} max={todayISO()} />
 
