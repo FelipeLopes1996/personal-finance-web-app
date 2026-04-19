@@ -11,6 +11,7 @@ import Category from "@/pages/Category";
 import Dashboard from "@/pages/Dashboard";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
+import IaChat from "@/pages/IaChat";
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
           { path: "dashboard", element: <Dashboard /> },
           { path: "profile", element: <Profile /> },
           { path: "category", element: <Category /> },
+          { path: "ia-chat", element: <IaChat /> },
           // { path: "settings", element: <Settings /> }, // /dashboard/settings
         ],
       },
