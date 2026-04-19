@@ -6,9 +6,16 @@ type NavItemProps = {
   icon: React.ReactNode;
   label: string;
   isFooter: boolean;
+  isShowOnFooter?: boolean;
 };
 
-export function NavItem({ to, icon, label, isFooter }: NavItemProps) {
+export function NavItem({
+  to,
+  icon,
+  label,
+  isFooter,
+  isShowOnFooter = false,
+}: NavItemProps) {
   return (
     <NavLink
       to={to}
@@ -18,7 +25,8 @@ export function NavItem({ to, icon, label, isFooter }: NavItemProps) {
           isFooter
             ? "flex-col text-xs"
             : "p-3.5 gap-3 border-b-1 border-[#666]",
-          isActive && "text-teal-600 font-semibold border-teal-600"
+          isActive && "text-teal-600 font-semibold border-teal-600",
+          isShowOnFooter && "hidden md:flex",
         )
       }
     >

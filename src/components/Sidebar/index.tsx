@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  MessageSquare,
   ShoppingCart,
   TableOfContents,
   User,
@@ -24,6 +25,12 @@ export default function Sidebar({ variant }: SidebarProps) {
       )}
     >
       <NavItem
+        to="/dashboard"
+        icon={<LayoutDashboard />}
+        label="Dashboard"
+        isFooter={isFooter}
+      />
+      <NavItem
         to="/expense"
         icon={<ShoppingCart />}
         label="Gastos"
@@ -36,10 +43,11 @@ export default function Sidebar({ variant }: SidebarProps) {
         isFooter={isFooter}
       />
       <NavItem
-        to="/dashboard"
-        icon={<LayoutDashboard />}
-        label="Dashboard"
+        to="/ia-chat"
+        icon={<MessageSquare />}
+        label="Consultor de Gastos"
         isFooter={isFooter}
+        isShowOnFooter={true}
       />
       <NavItem
         to="/profile"
